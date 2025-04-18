@@ -86,17 +86,31 @@ public class Camera {
         return result;
     }
 
-    // Metoda zwracająca macierz rzutowania perspektywicznego zgodną ze slajdem
+    // Metoda zwracająca macierz rzutowania perspektywicznego zgodną ze slajdem 1 (M_p1)
     public double[][] getProjectionMatrix() {
-        // Macierz rzutowania perspektywicznego M_p2 ze slajdu
-        // Gdzie d to odległość środka rzutowania od rzutni (d = |z|)
-        double d = Math.abs(z);  // Używamy wartości bezwzględnej z pozycji kamery
+        // Na slajdzie 1 mamy macierz M_p1 o strukturze:
+        // [1  0  0  0]
+        // [0  1  0  0]
+        // [0  0  1  0]
+        // [0  0  1/d 0]
+        //
+        // Gdzie:
+        // - Rzutnia: z = d, d > 0
+        // - Środek rzutowania: [0,0,0]
 
+        // Stała odległość rzutni od środka rzutowania
+        double d = 5.0;
+
+        // Uwzględnienie FOV (pole widzenia)
+        // Im większy FOV, tym silniejszy efekt perspektywy
+        double fovScale = Math.tan(Math.toRadians(fov) / 2) / Math.tan(Math.toRadians(60) / 2);
+
+        // Macierz rzutowania perspektywicznego M_p1 ze slajdu
         return new double[][] {
                 {1, 0, 0, 0},
                 {0, 1, 0, 0},
-                {0, 0, 0, 0},
-                {0, 0, 1/d, 1}
+                {0, 0, 1, 0},
+                {0, 0, fovScale/d, 0}
         };
     }
 
