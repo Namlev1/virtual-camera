@@ -1,5 +1,4 @@
 package v3;
-
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.KeyAdapter;
@@ -20,7 +19,8 @@ public class Main extends JFrame {
         setLocationRelativeTo(null);
 
         // Inicjalizacja kamery
-        // Początkowa pozycja kamery to (0, 0, -5), czyli 5 jednostek od środka sześcianu
+        // Początkowa pozycja kamery to (0, 0, -5), czyli kamery jest w punkcie [0,0,-5]
+        // Co odpowiada środkowi rzutowania [0,0,-d] ze slajdu, gdzie d = 5
         // FOV = 60 stopni, proporcje ekranu = szerokość/wysokość, near = 0.1, far = 100
         camera = new Camera(0, 0, -5, 60, (double)WIDTH / HEIGHT, 0.1, 100);
 
@@ -41,6 +41,13 @@ public class Main extends JFrame {
 
                 // Rysowanie sześcianu
                 renderer.renderCube(g, cube);
+
+                // Wyświetlanie informacji o projekcji
+                g.setColor(Color.BLACK);
+                g.drawString("Wirtualna Kamera 3D - Rzutowanie perspektywiczne", 10, 20);
+                g.drawString("Macierz rzutowania ze slajdu: M_p2", 10, 40);
+                g.drawString("Środek rzutowania: [0, 0, -" + Math.abs(camera.getZ()) + "]", 10, 60);
+                g.drawString("Rzutnia: płaszczyzna z = 0", 10, 80);
             }
         };
 

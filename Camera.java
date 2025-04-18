@@ -1,5 +1,4 @@
 package v3;
-
 public class Camera {
     private double x, y, z;           // Pozycja kamery
     private double rotX, rotY, rotZ;  // Kąty rotacji wokół osi X, Y, Z (w radianach)
@@ -35,17 +34,17 @@ public class Camera {
         return translationMatrix;
     }
 
-    // Metoda zwracająca macierz rzutowania perspektywicznego
+    // Metoda zwracająca macierz rzutowania perspektywicznego zgodną ze slajdem
     public double[][] getProjectionMatrix() {
-        double f = 1.0 / Math.tan(Math.toRadians(fov) / 2.0);
-        double rangeInv = 1.0 / (near - far);
+        // Macierz rzutowania perspektywicznego M_p2 ze slajdu
+        // Gdzie d to odległość środka rzutowania od rzutni (d = |z|)
+        double d = Math.abs(z);  // Używamy wartości bezwzględnej z pozycji kamery
 
-        // Macierz rzutowania perspektywicznego
         return new double[][] {
-                {f / aspectRatio, 0, 0, 0},
-                {0, f, 0, 0},
-                {0, 0, (near + far) * rangeInv, 2 * near * far * rangeInv},
-                {0, 0, -1, 0}
+                {1, 0, 0, 0},
+                {0, 1, 0, 0},
+                {0, 0, 0, 0},
+                {0, 0, 1/d, 1}
         };
     }
 

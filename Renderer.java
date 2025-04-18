@@ -1,5 +1,4 @@
 package v3;
-
 import java.awt.Graphics;
 import java.awt.Color;
 import java.util.ArrayList;
@@ -42,19 +41,20 @@ public class Renderer {
         // Zastosowanie macierzy widoku
         double[] viewVector = multiplyMatrixVector(viewMatrix, pointVector);
 
-        // Zastosowanie macierzy rzutowania
+        // Zastosowanie macierzy rzutowania zgodnej ze slajdem
         double[] projectedVector = multiplyMatrixVector(projectionMatrix, viewVector);
 
         // Normalizacja współrzędnych homogenicznych
         if (projectedVector[3] != 0) {
             projectedVector[0] /= projectedVector[3];
             projectedVector[1] /= projectedVector[3];
-            projectedVector[2] /= projectedVector[3];
+            // Zauważ, że dla macierzy ze slajdu projectedVector[2] będzie zawsze 0
         }
 
         // Przekształcenie na współrzędne ekranu
-        int screenX = (int)((projectedVector[0] + 1.0) * 0.5 * screenWidth);
-        int screenY = (int)((1.0 - (projectedVector[1] + 1.0) * 0.5) * screenHeight);
+        // Środek ekranu ma być w środku okna, więc mapujemy odpowiednio
+        int screenX = (int)(screenWidth / 2 + projectedVector[0] * screenHeight / 2);
+        int screenY = (int)(screenHeight / 2 - projectedVector[1] * screenHeight / 2);
 
         return new java.awt.Point(screenX, screenY);
     }
