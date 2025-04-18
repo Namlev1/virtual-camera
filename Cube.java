@@ -7,24 +7,24 @@ public class Cube {
     private List<Point3D> vertices;
     private List<Edge> edges;
 
-    // Tworzymy sześcian o środku w punkcie (0,0,0) i o określonej wielkości
-    public Cube(double size) {
+    // Tworzymy sześcian o środku w punkcie (x,y,z) i o określonej wielkości
+    public Cube(double size, double x, double y, double z) {
         double halfSize = size / 2.0;
 
         // Inicjalizacja wierzchołków sześcianu
         vertices = new ArrayList<>();
 
         // Przód
-        vertices.add(new Point3D(-halfSize, -halfSize, halfSize));  // 0: lewy dolny przedni
-        vertices.add(new Point3D(halfSize, -halfSize, halfSize));   // 1: prawy dolny przedni
-        vertices.add(new Point3D(halfSize, halfSize, halfSize));    // 2: prawy górny przedni
-        vertices.add(new Point3D(-halfSize, halfSize, halfSize));   // 3: lewy górny przedni
+        vertices.add(new Point3D(-halfSize + x, -halfSize + y, halfSize + z));  // 0: lewy dolny przedni
+        vertices.add(new Point3D(halfSize + x, -halfSize + y, halfSize + z));   // 1: prawy dolny przedni
+        vertices.add(new Point3D(halfSize + x, halfSize + y, halfSize + z));    // 2: prawy górny przedni
+        vertices.add(new Point3D(-halfSize + x, halfSize + y, halfSize + z));   // 3: lewy górny przedni
 
         // Tył
-        vertices.add(new Point3D(-halfSize, -halfSize, -halfSize)); // 4: lewy dolny tylny
-        vertices.add(new Point3D(halfSize, -halfSize, -halfSize));  // 5: prawy dolny tylny
-        vertices.add(new Point3D(halfSize, halfSize, -halfSize));   // 6: prawy górny tylny
-        vertices.add(new Point3D(-halfSize, halfSize, -halfSize));  // 7: lewy górny tylny
+        vertices.add(new Point3D(-halfSize + x, -halfSize + y, -halfSize + z)); // 4: lewy dolny tylny
+        vertices.add(new Point3D(halfSize + x, -halfSize + y, -halfSize + z));  // 5: prawy dolny tylny
+        vertices.add(new Point3D(halfSize + x, halfSize + y, -halfSize + z));   // 6: prawy górny tylny
+        vertices.add(new Point3D(-halfSize + x, halfSize + y, -halfSize + z));  // 7: lewy górny tylny
 
         // Inicjalizacja krawędzi sześcianu
         edges = new ArrayList<>();
@@ -46,6 +46,11 @@ public class Cube {
         edges.add(new Edge(vertices.get(1), vertices.get(5)));
         edges.add(new Edge(vertices.get(2), vertices.get(6)));
         edges.add(new Edge(vertices.get(3), vertices.get(7)));
+    }
+
+    // Konstruktor dla kompatybilności z poprzednią wersją
+    public Cube(double size) {
+        this(size, 0, 0, 0);
     }
 
     public List<Point3D> getVertices() {

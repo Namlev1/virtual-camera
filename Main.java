@@ -4,13 +4,15 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Main extends JFrame {
     private static final int WIDTH = 800;
     private static final int HEIGHT = 600;
 
     private Camera camera;
-    private Cube cube;
+    private List<Cube> cubes; // Zmiana na listę sześcianów
     private Renderer renderer;
     private JPanel panel;  // Dodana deklaracja panelu jako pole klasy
 
@@ -21,13 +23,13 @@ public class Main extends JFrame {
         setLocationRelativeTo(null);
 
         // Inicjalizacja kamery
-        // Początkowa pozycja kamery to (0, 0, -5), czyli kamery jest w punkcie [0,0,-5]
-        // Co odpowiada środkowi rzutowania [0,0,-d] ze slajdu, gdzie d = 5
+        // Początkowa pozycja kamery to (0, 0, -10), czyli kamery jest w punkcie [0,0,-10]
+        // Co odpowiada środkowi rzutowania [0,0,-d] ze slajdu, gdzie d = 10
         // FOV = 60 stopni, proporcje ekranu = szerokość/wysokość, near = 0.1, far = 100
         camera = new Camera(0, 0, -5, 60, (double)WIDTH / HEIGHT, 0.1, 100);
 
-        // Inicjalizacja sześcianu o wielkości 2
-        cube = new Cube(2.0);
+        // Inicjalizacja sześcianów - układ podobny do logo Code::Blocks
+        cubes = createCodeBlocksLogo();
 
         // Inicjalizacja renderera
         renderer = new Renderer(camera, WIDTH, HEIGHT);
@@ -41,8 +43,10 @@ public class Main extends JFrame {
                 g.setColor(Color.WHITE);
                 g.fillRect(0, 0, getWidth(), getHeight());
 
-                // Rysowanie sześcianu
-                renderer.renderCube(g, cube);
+                // Rysowanie sześcianów
+                for (Cube cube : cubes) {
+                    renderer.renderCube(g, cube);
+                }
 
                 // Wyświetlanie informacji o projekcji
                 g.setColor(Color.BLACK);
@@ -57,17 +61,40 @@ public class Main extends JFrame {
             }
         };
 
-        // Dodanie obsługi klawiatury (na razie bez implementacji)
+        // Dodanie obsługi klawiatury
         panel.setFocusable(true);
         panel.addKeyListener(new KeyAdapter() {
             @Override
             public void keyPressed(KeyEvent e) {
                 handleKeyPress(e);
-                panel.repaint();
             }
         });
 
         add(panel);
+    }
+
+    // Metoda tworząca sześciany ułożone podobnie do logo Code::Blocks
+    private List<Cube> createCodeBlocksLogo() {
+        List<Cube> cubeList = new ArrayList<>();
+
+        // Rozmiar sześcianu
+        double size = 1.5;
+        // Odległość między sześcianami - zmniejszona z 2.5 na 2.0
+        double spacing = 1.5;
+
+        // Sześcian w lewym górnym rogu (C)
+        cubeList.add(new Cube(size, -spacing, spacing, 0));
+
+        // Sześcian w prawym górnym rogu (B)
+        cubeList.add(new Cube(size, spacing, spacing, 0));
+
+        // Sześcian w lewym dolnym rogu (pierwszy :)
+        cubeList.add(new Cube(size, -spacing, -spacing, 0));
+
+        // Sześcian w prawym dolnym rogu (drugi :)
+        cubeList.add(new Cube(size, spacing, -spacing, 0));
+
+        return cubeList;
     }
 
     private void handleKeyPress(KeyEvent e) {

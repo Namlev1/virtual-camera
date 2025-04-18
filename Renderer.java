@@ -75,7 +75,6 @@ public class Renderer {
         // Sprawdzenie, czy punkty są widoczne (nie są poza ekranem)
         if (startPoint.x >= -500 && startPoint.y >= -500 &&
                 endPoint.x >= -500 && endPoint.y >= -500) {
-            g.setColor(Color.BLACK);
             g.drawLine(startPoint.x, startPoint.y, endPoint.x, endPoint.y);
         }
     }
@@ -83,6 +82,8 @@ public class Renderer {
     // Metoda do renderowania całego sześcianu
     public void renderCube(Graphics g, Cube cube) {
         List<Edge> edges = cube.getEdges();
+
+        g.setColor(Color.BLACK);
 
         for (Edge edge : edges) {
             renderEdge(g, edge);
