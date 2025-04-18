@@ -1,4 +1,6 @@
 package v3;
+
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.KeyAdapter;
@@ -48,8 +50,9 @@ public class Main extends JFrame {
                 g.drawString("Wirtualna Kamera 3D - Rzutowanie perspektywiczne", 10, 20);
                 g.drawString("Macierz rzutowania ze slajdu: M_p2", 10, 40);
                 g.drawString("Środek rzutowania: [" + camera.getX() + ", " + camera.getY() + ", " + camera.getZ() + "]", 10, 60);
-                g.drawString("Rzutnia: płaszczyzna z = 0", 10, 80);
-                g.drawString("Sterowanie: WASD - poruszanie kamerą, QE - przód/tył", 10, 100);
+                g.drawString("Rotacja wokół osi Y: " + String.format("%.2f", camera.getRotY()) + " rad", 10, 80);
+                g.drawString("Rzutnia: płaszczyzna z = 0", 10, 100);
+                g.drawString("Sterowanie: WASD - poruszanie kamerą, QE - przód/tył, ←→ - obrót", 10, 120);
             }
         };
 
@@ -69,6 +72,9 @@ public class Main extends JFrame {
     private void handleKeyPress(KeyEvent e) {
         // Stała określająca o ile jednostek przesuwać kamerę przy każdym naciśnięciu klawisza
         double moveSpeed = 0.5;
+        // Stała określająca o ile radianów obracać kamerę przy każdym naciśnięciu klawisza
+        double rotateSpeed = 0.1;
+
         switch (e.getKeyCode()) {
             // Podstawowe sterowanie (WASD + QE)
             case KeyEvent.VK_A: // Lewo
@@ -89,6 +95,14 @@ public class Main extends JFrame {
             case KeyEvent.VK_PERIOD:
                 camera.setZ(camera.getZ() + moveSpeed);
                 break;
+
+            // Sterowanie obrotem kamery
+            case KeyEvent.VK_LEFT: // Obrót w lewo (wokół osi Y)
+                camera.setRotY(camera.getRotY() + rotateSpeed);
+                break;
+            case KeyEvent.VK_RIGHT: // Obrót w prawo (wokół osi Y)
+                camera.setRotY(camera.getRotY() - rotateSpeed);
+                break;
         }
 
         // Odświeżenie panelu po każdej zmianie
@@ -97,7 +111,8 @@ public class Main extends JFrame {
         // Aktualizacja informacji o pozycji kamery
         System.out.println("Pozycja kamery: [" + camera.getX() + ", " +
                 camera.getY() + ", " +
-                camera.getZ() + "]");
+                camera.getZ() + "], Rotacja Y: " +
+                camera.getRotY());
     }
 
     public static void main(String[] args) {

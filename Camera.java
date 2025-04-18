@@ -1,4 +1,5 @@
 package v3;
+
 public class Camera {
     private double x, y, z;           // Pozycja kamery
     private double rotX, rotY, rotZ;  // Kąty rotacji wokół osi X, Y, Z (w radianach)
@@ -19,9 +20,20 @@ public class Camera {
         this.far = far;
     }
 
-    // Metoda zwracająca macierz widoku
+    // Metoda zwracająca macierz widoku z uwzględnieniem rotacji wokół osi Y
     public double[][] getViewMatrix() {
-        // Macierz translacji - przesuwa wszystkie punkty w kierunku przeciwnym do pozycji kamery
+        // Najpierw tworzymy macierz rotacji wokół osi Y
+        double sinY = Math.sin(rotY);
+        double cosY = Math.cos(rotY);
+
+        double[][] rotationMatrixY = {
+                {cosY,  0, sinY, 0},
+                {0,     1, 0,    0},
+                {-sinY, 0, cosY, 0},
+                {0,     0, 0,    1}
+        };
+
+        // Następnie tworzymy macierz translacji
         double[][] translationMatrix = {
                 {1, 0, 0, -x},
                 {0, 1, 0, -y},
@@ -29,7 +41,24 @@ public class Camera {
                 {0, 0, 0, 1}
         };
 
-        return translationMatrix;
+        // Mnożymy macierz rotacji przez macierz translacji
+        // Kolejność jest ważna - najpierw rotacja, potem translacja
+        return multiplyMatrices(rotationMatrixY, translationMatrix);
+    }
+
+    // Metoda pomocnicza do mnożenia macierzy 4x4
+    private double[][] multiplyMatrices(double[][] matrixA, double[][] matrixB) {
+        double[][] result = new double[4][4];
+
+        for (int i = 0; i < 4; i++) {
+            for (int j = 0; j < 4; j++) {
+                for (int k = 0; k < 4; k++) {
+                    result[i][j] += matrixA[i][k] * matrixB[k][j];
+                }
+            }
+        }
+
+        return result;
     }
 
     // Metoda zwracająca macierz rzutowania perspektywicznego zgodną ze slajdem
