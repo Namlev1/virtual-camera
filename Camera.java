@@ -20,12 +20,23 @@ public class Camera {
         this.far = far;
     }
 
-    // Metoda zwracająca macierz widoku z uwzględnieniem rotacji wokół osi Y
+    // Metoda zwracająca macierz widoku z uwzględnieniem rotacji wokół wszystkich osi
     public double[][] getViewMatrix() {
-        // Najpierw tworzymy macierz rotacji wokół osi Y
+        // Tworzymy macierze rotacji wokół osi X, Y, Z
+
+        // Macierz rotacji wokół osi X (góra/dół)
+        double sinX = Math.sin(rotX);
+        double cosX = Math.cos(rotX);
+        double[][] rotationMatrixX = {
+                {1, 0,    0,     0},
+                {0, cosX, -sinX, 0},
+                {0, sinX, cosX,  0},
+                {0, 0,    0,     1}
+        };
+
+        // Macierz rotacji wokół osi Y (lewo/prawo)
         double sinY = Math.sin(rotY);
         double cosY = Math.cos(rotY);
-
         double[][] rotationMatrixY = {
                 {cosY,  0, sinY, 0},
                 {0,     1, 0,    0},
@@ -33,7 +44,17 @@ public class Camera {
                 {0,     0, 0,    1}
         };
 
-        // Następnie tworzymy macierz translacji
+        // Macierz rotacji wokół osi Z (przechylanie)
+        double sinZ = Math.sin(rotZ);
+        double cosZ = Math.cos(rotZ);
+        double[][] rotationMatrixZ = {
+                {cosZ, -sinZ, 0, 0},
+                {sinZ, cosZ,  0, 0},
+                {0,    0,     1, 0},
+                {0,    0,     0, 1}
+        };
+
+        // Macierz translacji
         double[][] translationMatrix = {
                 {1, 0, 0, -x},
                 {0, 1, 0, -y},
@@ -41,9 +62,13 @@ public class Camera {
                 {0, 0, 0, 1}
         };
 
-        // Mnożymy macierz rotacji przez macierz translacji
-        // Kolejność jest ważna - najpierw rotacja, potem translacja
-        return multiplyMatrices(rotationMatrixY, translationMatrix);
+        // Mnożymy macierze rotacji i translacji w odpowiedniej kolejności
+        // Kolejność ma znaczenie: najpierw rotacja Z, potem X, potem Y, na końcu translacja
+        double[][] rotationMatrix = multiplyMatrices(rotationMatrixY,
+                multiplyMatrices(rotationMatrixX,
+                        rotationMatrixZ));
+
+        return multiplyMatrices(rotationMatrix, translationMatrix);
     }
 
     // Metoda pomocnicza do mnożenia macierzy 4x4

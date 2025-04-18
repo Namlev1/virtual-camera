@@ -1,6 +1,5 @@
 package v3;
 
-
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.KeyAdapter;
@@ -50,9 +49,11 @@ public class Main extends JFrame {
                 g.drawString("Wirtualna Kamera 3D - Rzutowanie perspektywiczne", 10, 20);
                 g.drawString("Macierz rzutowania ze slajdu: M_p2", 10, 40);
                 g.drawString("Środek rzutowania: [" + camera.getX() + ", " + camera.getY() + ", " + camera.getZ() + "]", 10, 60);
-                g.drawString("Rotacja wokół osi Y: " + String.format("%.2f", camera.getRotY()) + " rad", 10, 80);
-                g.drawString("Rzutnia: płaszczyzna z = 0", 10, 100);
-                g.drawString("Sterowanie: WASD - poruszanie kamerą, QE - przód/tył, ←→ - obrót", 10, 120);
+                g.drawString("Rotacja X: " + String.format("%.2f", camera.getRotX()) + " rad", 10, 80);
+                g.drawString("Rotacja Y: " + String.format("%.2f", camera.getRotY()) + " rad", 10, 100);
+                g.drawString("Rotacja Z: " + String.format("%.2f", camera.getRotZ()) + " rad", 10, 120);
+                g.drawString("Rzutnia: płaszczyzna z = 0", 10, 140);
+                g.drawString("Sterowanie: WASD - poruszanie, QE - przód/tył, ←→↑↓ - obrót X/Y, ;/Q - obrót Z", 10, 160);
             }
         };
 
@@ -96,12 +97,28 @@ public class Main extends JFrame {
                 camera.setZ(camera.getZ() + moveSpeed);
                 break;
 
-            // Sterowanie obrotem kamery
-            case KeyEvent.VK_LEFT: // Obrót w lewo (wokół osi Y)
+            // Sterowanie obrotem kamery wokół osi Y (lewo/prawo)
+            case KeyEvent.VK_LEFT: // Obrót w lewo
                 camera.setRotY(camera.getRotY() + rotateSpeed);
                 break;
-            case KeyEvent.VK_RIGHT: // Obrót w prawo (wokół osi Y)
+            case KeyEvent.VK_RIGHT: // Obrót w prawo
                 camera.setRotY(camera.getRotY() - rotateSpeed);
+                break;
+
+            // Sterowanie obrotem kamery wokół osi X (góra/dół)
+            case KeyEvent.VK_UP: // Obrót w górę
+                camera.setRotX(camera.getRotX() + rotateSpeed);
+                break;
+            case KeyEvent.VK_DOWN: // Obrót w dół
+                camera.setRotX(camera.getRotX() - rotateSpeed);
+                break;
+
+            // Sterowanie obrotem kamery wokół osi Z (przechylanie)
+            case KeyEvent.VK_SEMICOLON: // Przechylanie w lewo
+                camera.setRotZ(camera.getRotZ() - rotateSpeed);
+                break;
+            case KeyEvent.VK_Q: // Przechylanie w prawo
+                camera.setRotZ(camera.getRotZ() + rotateSpeed);
                 break;
         }
 
@@ -111,8 +128,10 @@ public class Main extends JFrame {
         // Aktualizacja informacji o pozycji kamery
         System.out.println("Pozycja kamery: [" + camera.getX() + ", " +
                 camera.getY() + ", " +
-                camera.getZ() + "], Rotacja Y: " +
-                camera.getRotY());
+                camera.getZ() + "], Rotacja: [" +
+                camera.getRotX() + ", " +
+                camera.getRotY() + ", " +
+                camera.getRotZ() + "]");
     }
 
     public static void main(String[] args) {
