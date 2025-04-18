@@ -26,7 +26,7 @@ public class Main extends JFrame {
         // Początkowa pozycja kamery to (0, 0, -5), czyli kamery jest w punkcie [0,0,-5]
         // Co odpowiada środkowi rzutowania [0,0,-d] ze slajdu, gdzie d = 5
         // FOV = 60 stopni, proporcje ekranu = szerokość/wysokość, near = 0.1, far = 100
-        camera = new Camera(0, 0, -5, 60, (double)WIDTH / HEIGHT, 0.1, 100);
+        camera = new Camera(0, 0, -5, 60);
 
         // Inicjalizacja sześcianów - układ podobny do logo Code::Blocks
         cubes = createCodeBlocksLogo();

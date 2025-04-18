@@ -4,10 +4,8 @@ public class Camera {
     private double x, y, z;           // Pozycja kamery
     private double rotX, rotY, rotZ;  // Kąty rotacji wokół osi X, Y, Z (w radianach)
     private double fov;               // Pole widzenia (w stopniach)
-    private double aspectRatio;       // Stosunek szerokości do wysokości ekranu
-    private double near, far;         // Płaszczyzny przycięcia
 
-    public Camera(double x, double y, double z, double fov, double aspectRatio, double near, double far) {
+    public Camera(double x, double y, double z, double fov) {
         this.x = x;
         this.y = y;
         this.z = z;
@@ -15,9 +13,6 @@ public class Camera {
         this.rotY = 0.0;
         this.rotZ = 0.0;
         this.fov = fov;
-        this.aspectRatio = aspectRatio;
-        this.near = near;
-        this.far = far;
     }
 
     // Metoda zwracająca macierz widoku z uwzględnieniem rotacji wokół wszystkich osi
