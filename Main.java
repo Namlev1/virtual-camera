@@ -23,8 +23,8 @@ public class Main extends JFrame {
         setLocationRelativeTo(null);
 
         // Inicjalizacja kamery
-        // Początkowa pozycja kamery to (0, 0, -10), czyli kamery jest w punkcie [0,0,-10]
-        // Co odpowiada środkowi rzutowania [0,0,-d] ze slajdu, gdzie d = 10
+        // Początkowa pozycja kamery to (0, 0, -5), czyli kamery jest w punkcie [0,0,-5]
+        // Co odpowiada środkowi rzutowania [0,0,-d] ze slajdu, gdzie d = 5
         // FOV = 60 stopni, proporcje ekranu = szerokość/wysokość, near = 0.1, far = 100
         camera = new Camera(0, 0, -5, 60, (double)WIDTH / HEIGHT, 0.1, 100);
 
@@ -56,8 +56,9 @@ public class Main extends JFrame {
                 g.drawString("Rotacja X: " + String.format("%.2f", camera.getRotX()) + " rad", 10, 80);
                 g.drawString("Rotacja Y: " + String.format("%.2f", camera.getRotY()) + " rad", 10, 100);
                 g.drawString("Rotacja Z: " + String.format("%.2f", camera.getRotZ()) + " rad", 10, 120);
-                g.drawString("Rzutnia: płaszczyzna z = 0", 10, 140);
-                g.drawString("Sterowanie: WASD - poruszanie, QE - przód/tył, ←→↑↓ - obrót X/Y, ;/Q - obrót Z", 10, 160);
+                g.drawString("FOV: " + String.format("%.1f", camera.getFov()) + "°", 10, 140);
+                g.drawString("Rzutnia: płaszczyzna z = 0", 10, 160);
+                g.drawString("Sterowanie: WASD - poruszanie, QE - przód/tył, ←→↑↓ - obrót X/Y, ;/Q - obrót Z, +/- - zoom", 10, 180);
             }
         };
 
@@ -79,7 +80,7 @@ public class Main extends JFrame {
 
         // Rozmiar sześcianu
         double size = 1.5;
-        // Odległość między sześcianami - zmniejszona z 2.5 na 2.0
+        // Odległość między sześcianami - zmniejszona na 1.5
         double spacing = 1.5;
 
         // Sześcian w lewym górnym rogu (C)
@@ -102,6 +103,8 @@ public class Main extends JFrame {
         double moveSpeed = 0.5;
         // Stała określająca o ile radianów obracać kamerę przy każdym naciśnięciu klawisza
         double rotateSpeed = 0.1;
+        // Stała określająca o ile stopni zmieniać FOV przy każdym naciśnięciu klawisza
+        double fovChangeSpeed = 5.0;
 
         switch (e.getKeyCode()) {
             // Podstawowe sterowanie (WASD + QE)
@@ -147,6 +150,14 @@ public class Main extends JFrame {
             case KeyEvent.VK_Q: // Przechylanie w prawo
                 camera.setRotZ(camera.getRotZ() + rotateSpeed);
                 break;
+
+            // Sterowanie polem widzenia (FOV)
+            case KeyEvent.VK_CLOSE_BRACKET:
+                camera.setFov(Math.min(camera.getFov() + fovChangeSpeed, 120)); // Maksymalnie 120 stopni
+                break;
+            case KeyEvent.VK_OPEN_BRACKET:
+                camera.setFov(Math.max(camera.getFov() - fovChangeSpeed, 30)); // Minimalnie 30 stopni
+                break;
         }
 
         // Odświeżenie panelu po każdej zmianie
@@ -158,7 +169,8 @@ public class Main extends JFrame {
                 camera.getZ() + "], Rotacja: [" +
                 camera.getRotX() + ", " +
                 camera.getRotY() + ", " +
-                camera.getRotZ() + "]");
+                camera.getRotZ() + "], FOV: " +
+                camera.getFov());
     }
 
     public static void main(String[] args) {
