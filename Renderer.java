@@ -1,4 +1,5 @@
 package v3;
+
 import java.awt.Graphics;
 import java.awt.Color;
 import java.util.ArrayList;
@@ -41,6 +42,13 @@ public class Renderer {
         // Zastosowanie macierzy widoku
         double[] viewVector = multiplyMatrixVector(viewMatrix, pointVector);
 
+        // Sprawdzenie, czy punkt jest przed kamerą (z > 0 w przestrzeni kamery)
+        // W naszym układzie współrzędnych kamera patrzy w kierunku dodatnich wartości Z
+        if (viewVector[2] <= 0) {
+            // Punkt jest za kamerą, zwracamy null lub punkt poza ekranem
+            return new java.awt.Point(-1000, -1000); // Punkt poza ekranem
+        }
+
         // Zastosowanie macierzy rzutowania zgodnej ze slajdem
         double[] projectedVector = multiplyMatrixVector(projectionMatrix, viewVector);
 
@@ -64,8 +72,12 @@ public class Renderer {
         java.awt.Point startPoint = projectPoint(edge.getStart());
         java.awt.Point endPoint = projectPoint(edge.getEnd());
 
-        g.setColor(Color.BLACK);
-        g.drawLine(startPoint.x, startPoint.y, endPoint.x, endPoint.y);
+        // Sprawdzenie, czy punkty są widoczne (nie są poza ekranem)
+        if (startPoint.x >= -500 && startPoint.y >= -500 &&
+                endPoint.x >= -500 && endPoint.y >= -500) {
+            g.setColor(Color.BLACK);
+            g.drawLine(startPoint.x, startPoint.y, endPoint.x, endPoint.y);
+        }
     }
 
     // Metoda do renderowania całego sześcianu

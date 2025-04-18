@@ -21,7 +21,7 @@ public class Camera {
 
     // Metoda zwracająca macierz widoku
     public double[][] getViewMatrix() {
-        // Macierz translacji
+        // Macierz translacji - przesuwa wszystkie punkty w kierunku przeciwnym do pozycji kamery
         double[][] translationMatrix = {
                 {1, 0, 0, -x},
                 {0, 1, 0, -y},
@@ -29,8 +29,6 @@ public class Camera {
                 {0, 0, 0, 1}
         };
 
-        // Na razie używamy tylko macierzy translacji
-        // W pełnej implementacji należałoby dodać również macierze rotacji
         return translationMatrix;
     }
 

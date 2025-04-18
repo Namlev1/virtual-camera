@@ -11,6 +11,7 @@ public class Main extends JFrame {
     private Camera camera;
     private Cube cube;
     private Renderer renderer;
+    private JPanel panel;  // Dodana deklaracja panelu jako pole klasy
 
     public Main() {
         setTitle("Wirtualna Kamera 3D");
@@ -31,7 +32,7 @@ public class Main extends JFrame {
         renderer = new Renderer(camera, WIDTH, HEIGHT);
 
         // Panel do rysowania
-        JPanel panel = new JPanel() {
+        panel = new JPanel() {
             @Override
             protected void paintComponent(Graphics g) {
                 super.paintComponent(g);
@@ -46,8 +47,9 @@ public class Main extends JFrame {
                 g.setColor(Color.BLACK);
                 g.drawString("Wirtualna Kamera 3D - Rzutowanie perspektywiczne", 10, 20);
                 g.drawString("Macierz rzutowania ze slajdu: M_p2", 10, 40);
-                g.drawString("Środek rzutowania: [0, 0, -" + Math.abs(camera.getZ()) + "]", 10, 60);
+                g.drawString("Środek rzutowania: [" + camera.getX() + ", " + camera.getY() + ", " + camera.getZ() + "]", 10, 60);
                 g.drawString("Rzutnia: płaszczyzna z = 0", 10, 80);
+                g.drawString("Sterowanie: WASD - poruszanie kamerą, QE - przód/tył", 10, 100);
             }
         };
 
@@ -65,8 +67,37 @@ public class Main extends JFrame {
     }
 
     private void handleKeyPress(KeyEvent e) {
-        // Na razie bez implementacji ruchów kamery
-        // Będzie to dodane w następnym kroku
+        // Stała określająca o ile jednostek przesuwać kamerę przy każdym naciśnięciu klawisza
+        double moveSpeed = 0.5;
+        switch (e.getKeyCode()) {
+            // Podstawowe sterowanie (WASD + QE)
+            case KeyEvent.VK_A: // Lewo
+                camera.setX(camera.getX() - moveSpeed);
+                break;
+            case KeyEvent.VK_E: // Prawo
+                camera.setX(camera.getX() + moveSpeed);
+                break;
+            case KeyEvent.VK_COMMA:
+                camera.setY(camera.getY() + moveSpeed);
+                break;
+            case KeyEvent.VK_O: // Dół
+                camera.setY(camera.getY() - moveSpeed);
+                break;
+            case KeyEvent.VK_QUOTE: // Do przodu
+                camera.setZ(camera.getZ() - moveSpeed);
+                break;
+            case KeyEvent.VK_PERIOD:
+                camera.setZ(camera.getZ() + moveSpeed);
+                break;
+        }
+
+        // Odświeżenie panelu po każdej zmianie
+        panel.repaint();
+
+        // Aktualizacja informacji o pozycji kamery
+        System.out.println("Pozycja kamery: [" + camera.getX() + ", " +
+                camera.getY() + ", " +
+                camera.getZ() + "]");
     }
 
     public static void main(String[] args) {
