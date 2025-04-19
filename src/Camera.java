@@ -1,4 +1,4 @@
-package v3;
+package src;
 
 public class Camera {
     private double x, y, z;

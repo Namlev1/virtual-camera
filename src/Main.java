@@ -1,4 +1,4 @@
-package v3;
+package src;
 
 import javax.swing.*;
 import java.awt.*;
@@ -11,10 +11,10 @@ public class Main extends JFrame {
     private static final int WIDTH = 800;
     private static final int HEIGHT = 600;
 
-    private Camera camera;
-    private List<Cube> cubes;
-    private Renderer renderer;
-    private JPanel panel;
+    private final Camera camera;
+    private final List<Cube> cubes;
+    private final Renderer renderer;
+    private final JPanel panel;
 
     public Main() {
         setTitle("Wirtualna Kamera 3D");

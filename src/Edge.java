@@ -1,4 +1,4 @@
-package v3;
+package src;
 
 public record Edge(Point3D start, Point3D end) {
 

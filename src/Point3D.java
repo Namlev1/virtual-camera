@@ -1,4 +1,4 @@
-package v3;
+package src;
 
 public record Point3D(double x, double y, double z) {
 
