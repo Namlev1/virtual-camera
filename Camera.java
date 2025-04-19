@@ -1,9 +1,9 @@
 package v3;
 
 public class Camera {
-    private double x, y, z;           // Pozycja kamery
-    private double rotX, rotY, rotZ;  // Kąty rotacji wokół osi X, Y, Z (w radianach)
-    private double fov;               // Pole widzenia (w stopniach)
+    private double x, y, z;
+    private double rotX, rotY, rotZ;
+    private double fov;
 
     public Camera(double x, double y, double z, double fov) {
         this.x = x;
@@ -17,26 +17,24 @@ public class Camera {
 
     // Metoda zwracająca macierz widoku z uwzględnieniem rotacji wokół wszystkich osi
     public double[][] getViewMatrix() {
-        // Tworzymy macierze rotacji wokół osi X, Y, Z
-
         // Macierz rotacji wokół osi X (góra/dół)
         double sinX = Math.sin(rotX);
         double cosX = Math.cos(rotX);
         double[][] rotationMatrixX = {
-                {1, 0,    0,     0},
+                {1, 0, 0, 0},
                 {0, cosX, -sinX, 0},
-                {0, sinX, cosX,  0},
-                {0, 0,    0,     1}
+                {0, sinX, cosX, 0},
+                {0, 0, 0, 1}
         };
 
         // Macierz rotacji wokół osi Y (lewo/prawo)
         double sinY = Math.sin(rotY);
         double cosY = Math.cos(rotY);
         double[][] rotationMatrixY = {
-                {cosY,  0, sinY, 0},
-                {0,     1, 0,    0},
+                {cosY, 0, sinY, 0},
+                {0, 1, 0, 0},
                 {-sinY, 0, cosY, 0},
-                {0,     0, 0,    1}
+                {0, 0, 0, 1}
         };
 
         // Macierz rotacji wokół osi Z (przechylanie)
@@ -44,9 +42,9 @@ public class Camera {
         double cosZ = Math.cos(rotZ);
         double[][] rotationMatrixZ = {
                 {cosZ, -sinZ, 0, 0},
-                {sinZ, cosZ,  0, 0},
-                {0,    0,     1, 0},
-                {0,    0,     0, 1}
+                {sinZ, cosZ, 0, 0},
+                {0, 0, 1, 0},
+                {0, 0, 0, 1}
         };
 
         // Macierz translacji
@@ -58,10 +56,10 @@ public class Camera {
         };
 
         // Mnożymy macierze rotacji i translacji w odpowiedniej kolejności
-        // Kolejność ma znaczenie: najpierw rotacja Z, potem X, potem Y, na końcu translacja
-        double[][] rotationMatrix = multiplyMatrices(rotationMatrixY,
-                multiplyMatrices(rotationMatrixX,
-                        rotationMatrixZ));
+        double[][] rotationMatrix = multiplyMatrices(
+                rotationMatrixY,
+                multiplyMatrices(rotationMatrixX, rotationMatrixZ)
+        );
 
         return multiplyMatrices(rotationMatrix, translationMatrix);
     }
@@ -81,9 +79,8 @@ public class Camera {
         return result;
     }
 
-    // Metoda zwracająca macierz rzutowania perspektywicznego zgodną ze slajdem 1 (M_p1)
+    // Metoda zwracająca macierz rzutowania perspektywicznego
     public double[][] getProjectionMatrix() {
-        // Na slajdzie 1 mamy macierz M_p1 o strukturze:
         // [1  0  0  0]
         // [0  1  0  0]
         // [0  0  1  0]
@@ -97,32 +94,71 @@ public class Camera {
         double d = 5.0;
 
         // Uwzględnienie FOV (pole widzenia)
-        // Im większy FOV, tym silniejszy efekt perspektywy
         double fovScale = Math.tan(Math.toRadians(fov) / 2) / Math.tan(Math.toRadians(60) / 2);
 
         // Macierz rzutowania perspektywicznego M_p1 ze slajdu
-        return new double[][] {
+        return new double[][]{
                 {1, 0, 0, 0},
                 {0, 1, 0, 0},
                 {0, 0, 1, 0},
-                {0, 0, fovScale/d, 0}
+                {0, 0, fovScale / d, 0}
         };
     }
 
     // Gettery i settery
-    public double getX() { return x; }
-    public double getY() { return y; }
-    public double getZ() { return z; }
-    public double getRotX() { return rotX; }
-    public double getRotY() { return rotY; }
-    public double getRotZ() { return rotZ; }
-    public double getFov() { return fov; }
+    public double getX() {
+        return x;
+    }
 
-    public void setX(double x) { this.x = x; }
-    public void setY(double y) { this.y = y; }
-    public void setZ(double z) { this.z = z; }
-    public void setRotX(double rotX) { this.rotX = rotX; }
-    public void setRotY(double rotY) { this.rotY = rotY; }
-    public void setRotZ(double rotZ) { this.rotZ = rotZ; }
-    public void setFov(double fov) { this.fov = fov; }
+    public double getY() {
+        return y;
+    }
+
+    public double getZ() {
+        return z;
+    }
+
+    public double getRotX() {
+        return rotX;
+    }
+
+    public double getRotY() {
+        return rotY;
+    }
+
+    public double getRotZ() {
+        return rotZ;
+    }
+
+    public double getFov() {
+        return fov;
+    }
+
+    public void setX(double x) {
+        this.x = x;
+    }
+
+    public void setY(double y) {
+        this.y = y;
+    }
+
+    public void setZ(double z) {
+        this.z = z;
+    }
+
+    public void setRotX(double rotX) {
+        this.rotX = rotX;
+    }
+
+    public void setRotY(double rotY) {
+        this.rotY = rotY;
+    }
+
+    public void setRotZ(double rotZ) {
+        this.rotZ = rotZ;
+    }
+
+    public void setFov(double fov) {
+        this.fov = fov;
+    }
 }

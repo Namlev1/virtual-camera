@@ -12,9 +12,9 @@ public class Main extends JFrame {
     private static final int HEIGHT = 600;
 
     private Camera camera;
-    private List<Cube> cubes; // Zmiana na listę sześcianów
+    private List<Cube> cubes;
     private Renderer renderer;
-    private JPanel panel;  // Dodana deklaracja panelu jako pole klasy
+    private JPanel panel;
 
     public Main() {
         setTitle("Wirtualna Kamera 3D");
@@ -23,10 +23,7 @@ public class Main extends JFrame {
         setLocationRelativeTo(null);
 
         // Inicjalizacja kamery
-        // Początkowa pozycja kamery to (0, 0, -5), czyli kamery jest w punkcie [0,0,-5]
-        // Co odpowiada środkowi rzutowania [0,0,-d] ze slajdu, gdzie d = 5
-        // FOV = 60 stopni, proporcje ekranu = szerokość/wysokość, near = 0.1, far = 100
-        camera = new Camera(0, 0, -5, 60);
+        camera = new Camera(0, 0, -10, 60);
 
         // Inicjalizacja sześcianów - układ podobny do logo Code::Blocks
         cubes = createCodeBlocksLogo();
@@ -51,14 +48,11 @@ public class Main extends JFrame {
                 // Wyświetlanie informacji o projekcji
                 g.setColor(Color.BLACK);
                 g.drawString("Wirtualna Kamera 3D - Rzutowanie perspektywiczne", 10, 20);
-                g.drawString("Macierz rzutowania ze slajdu: M_p2", 10, 40);
                 g.drawString("Środek rzutowania: [" + camera.getX() + ", " + camera.getY() + ", " + camera.getZ() + "]", 10, 60);
                 g.drawString("Rotacja X: " + String.format("%.2f", camera.getRotX()) + " rad", 10, 80);
                 g.drawString("Rotacja Y: " + String.format("%.2f", camera.getRotY()) + " rad", 10, 100);
                 g.drawString("Rotacja Z: " + String.format("%.2f", camera.getRotZ()) + " rad", 10, 120);
                 g.drawString("FOV: " + String.format("%.1f", camera.getFov()) + "°", 10, 140);
-                g.drawString("Rzutnia: płaszczyzna z = 0", 10, 160);
-                g.drawString("Sterowanie: WASD - poruszanie, QE - przód/tył, ←→↑↓ - obrót X/Y, ;/Q - obrót Z, +/- - zoom", 10, 180);
             }
         };
 
@@ -74,36 +68,30 @@ public class Main extends JFrame {
         add(panel);
     }
 
-    // Metoda tworząca sześciany ułożone podobnie do logo Code::Blocks
     private List<Cube> createCodeBlocksLogo() {
         List<Cube> cubeList = new ArrayList<>();
 
-        // Rozmiar sześcianu
         double size = 1.5;
-        // Odległość między sześcianami - zmniejszona na 1.5
-        double spacing = 1.5;
+        double spacing = 1;
 
-        // Sześcian w lewym górnym rogu (C)
+        // Lewy górny
         cubeList.add(new Cube(size, -spacing, spacing, 0));
 
-        // Sześcian w prawym górnym rogu (B)
+        // Prawy górny
         cubeList.add(new Cube(size, spacing, spacing, 0));
 
-        // Sześcian w lewym dolnym rogu (pierwszy :)
+        // Lewy dolny
         cubeList.add(new Cube(size, -spacing, -spacing, 0));
 
-        // Sześcian w prawym dolnym rogu (drugi :)
+        // Prawy dolny
         cubeList.add(new Cube(size, spacing, -spacing, 0));
 
         return cubeList;
     }
 
     private void handleKeyPress(KeyEvent e) {
-        // Stała określająca o ile jednostek przesuwać kamerę przy każdym naciśnięciu klawisza
         double moveSpeed = 0.5;
-        // Stała określająca o ile radianów obracać kamerę przy każdym naciśnięciu klawisza
         double rotateSpeed = 0.1;
-        // Stała określająca o ile stopni zmieniać FOV przy każdym naciśnięciu klawisza
         double fovChangeSpeed = 5.0;
 
         switch (e.getKeyCode()) {
@@ -114,16 +102,16 @@ public class Main extends JFrame {
             case KeyEvent.VK_E: // Prawo
                 camera.setX(camera.getX() + moveSpeed);
                 break;
-            case KeyEvent.VK_COMMA:
+            case KeyEvent.VK_COMMA: // Góra
                 camera.setY(camera.getY() + moveSpeed);
                 break;
             case KeyEvent.VK_O: // Dół
                 camera.setY(camera.getY() - moveSpeed);
                 break;
-            case KeyEvent.VK_QUOTE: // Do przodu
+            case KeyEvent.VK_QUOTE: // Przód
                 camera.setZ(camera.getZ() - moveSpeed);
                 break;
-            case KeyEvent.VK_PERIOD:
+            case KeyEvent.VK_PERIOD: // Tył
                 camera.setZ(camera.getZ() + moveSpeed);
                 break;
 
@@ -153,17 +141,15 @@ public class Main extends JFrame {
 
             // Sterowanie polem widzenia (FOV)
             case KeyEvent.VK_CLOSE_BRACKET:
-                camera.setFov(Math.min(camera.getFov() + fovChangeSpeed, 120)); // Maksymalnie 120 stopni
+                camera.setFov(Math.max(camera.getFov() - fovChangeSpeed, 30)); // Minimalnie 30 stopni
                 break;
             case KeyEvent.VK_OPEN_BRACKET:
-                camera.setFov(Math.max(camera.getFov() - fovChangeSpeed, 30)); // Minimalnie 30 stopni
+                camera.setFov(Math.min(camera.getFov() + fovChangeSpeed, 120)); // Maksymalnie 120 stopni
                 break;
         }
 
-        // Odświeżenie panelu po każdej zmianie
         panel.repaint();
 
-        // Aktualizacja informacji o pozycji kamery
         System.out.println("Pozycja kamery: [" + camera.getX() + ", " +
                 camera.getY() + ", " +
                 camera.getZ() + "], Rotacja: [" +
