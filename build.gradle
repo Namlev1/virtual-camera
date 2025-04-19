@@ -1,0 +1,52 @@
+plugins {
+    id 'java'
+    id 'application'
+}
+
+group 'com.example'
+version '1.0-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    // EJML - Efficient Java Matrix Library
+    implementation 'org.ejml:ejml-all:0.41'
+
+    // Apache Commons Math for quaternions
+    implementation 'org.apache.commons:commons-math3:3.6.1'
+
+    // Dodaj JUnit dla testów (opcjonalnie)
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.1'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.1'
+}
+
+application {
+    mainClass = 'src.VirtualCameraDemo'
+}
+
+test {
+    useJUnitPlatform()
+}
+
+// Dla kompatybilności z Java 8+
+java {
+    sourceCompatibility = JavaVersion.VERSION_1_8
+    targetCompatibility = JavaVersion.VERSION_1_8
+}
+
+// Włączenie opcji UTF-8 dla kompilacji
+tasks.withType(JavaCompile) {
+    options.encoding = 'UTF-8'
+}
+
+// Pakowanie do jar z zależnościami
+task fatJar(type: Jar) {
+    manifest {
+        attributes 'Main-Class': 'src.VirtualCameraDemo'
+    }
+    archiveBaseName = "${project.name}-fat"
+    from { configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) } }
+    with jar
+}
