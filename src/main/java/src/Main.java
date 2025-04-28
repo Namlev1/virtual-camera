@@ -7,31 +7,26 @@ import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.List;
 
-public class VirtualCameraDemo extends JPanel {
+public class Main extends JPanel {
     private static final int WIDTH = 800;
     private static final int HEIGHT = 600;
 
-    private Camera camera;
-    private Renderer renderer;
-    private List<Shape> shapes;
+    private final Camera camera;
+    private final Renderer renderer;
+    private final List<Cube> shapes;
 
-    public VirtualCameraDemo() {
+    public Main() {
         // Inicjalizacja kamery z początkowym parametrem d = 2.0
         camera = new Camera(2.0f, WIDTH, HEIGHT);
 
-        // Inicjalizacja renderera
         renderer = new Renderer(camera, null);
 
-        // Stworzenie kształtów do wyświetlenia (logo code blocks - 4 kostki)
         shapes = new ArrayList<>();
-
-        // Dodanie czterech kostek imitujących logo Code::Blocks
         shapes.add(new Cube(-1.5f, -1.5f, 4.0f, 1.0f, 1.0f, 1.0f));  // Lewa dolna
         shapes.add(new Cube(1.5f, -1.5f, 4.0f, 1.0f, 1.0f, 1.0f));   // Prawa dolna
         shapes.add(new Cube(-1.5f, 1.5f, 4.0f, 1.0f, 1.0f, 1.0f));   // Lewa górna
         shapes.add(new Cube(1.5f, 1.5f, 4.0f, 1.0f, 1.0f, 1.0f));    // Prawa górna
 
-        // Ustawienie obsługi klawiatury
         setFocusable(true);
         addKeyListener(new KeyAdapter() {
             @Override
@@ -41,9 +36,6 @@ public class VirtualCameraDemo extends JPanel {
         });
     }
 
-    /**
-     * Obsługa naciśnięć klawiszy sterujących kamerą
-     */
     private void handleKeyPress(KeyEvent e) {
         int keyCode = e.getKeyCode();
 
@@ -89,15 +81,14 @@ public class VirtualCameraDemo extends JPanel {
                 break;
 
             // Zmiana FOV (zoom)
-            case KeyEvent.VK_CLOSE_BRACKET:  // Przybliżenie (zmniejszenie FOV) (])
+            case KeyEvent.VK_CLOSE_BRACKET:  // Zoom in ]
                 camera.stepD(1);
                 break;
-            case KeyEvent.VK_OPEN_BRACKET:  // Oddalenie (zwiększenie FOV) ([)
+            case KeyEvent.VK_OPEN_BRACKET:  // Zoom out [
                 camera.stepD(-1);
                 break;
         }
 
-        // Odświeżenie widoku
         repaint();
     }
     @Override
@@ -108,42 +99,14 @@ public class VirtualCameraDemo extends JPanel {
         g.setColor(Color.WHITE);
         g.fillRect(0, 0, getWidth(), getHeight());
 
-        // Rysowanie siatki dla lepszej orientacji
-        g.setColor(Color.LIGHT_GRAY);
-        for (int i = 0; i < getWidth(); i += 50) {
-            g.drawLine(i, 0, i, getHeight());
-        }
-        for (int i = 0; i < getHeight(); i += 50) {
-            g.drawLine(0, i, getWidth(), i);
-        }
-
-        // Ustawienie koloru rysowania
         g.setColor(Color.BLACK);
 
-        // Aktualizacja renderera z aktualnym kontekstem graficznym
         renderer.setGraphics(g);
 
         // Renderowanie wszystkich kształtów
-        for (Shape shape : shapes) {
-            renderer.drawShape(shape);
+        for (Cube cube : shapes) {
+            renderer.drawShape(cube);
         }
-
-        // Wyświetlenie informacji o sterowaniu
-        drawControlsInfo(g);
-    }
-
-    /**
-     * Wyświetla informacje o sterowaniu
-     */
-    private void drawControlsInfo(Graphics g) {
-        g.setColor(Color.BLACK);
-        int y = 20;
-
-        g.drawString("Sterowanie kamerą:", 10, y); y += 20;
-        g.drawString("W/S/A/D/Q/E - Translacja (przód/tył/lewo/prawo/dół/góra)", 10, y); y += 20;
-        g.drawString("Strzałki - Obrót góra/dół/lewo/prawo", 10, y); y += 20;
-        g.drawString("Z/X - Obrót wokół osi Z", 10, y); y += 20;
-        g.drawString("+/- - Zmiana FOV (zoom)", 10, y); y += 20;
     }
 
     public static void main(String[] args) {
@@ -153,7 +116,7 @@ public class VirtualCameraDemo extends JPanel {
             frame.setSize(WIDTH, HEIGHT);
             frame.setResizable(false);
 
-            VirtualCameraDemo cameraDemo = new VirtualCameraDemo();
+            Main cameraDemo = new Main();
             frame.add(cameraDemo);
 
             frame.setVisible(true);
