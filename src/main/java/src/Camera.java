@@ -53,9 +53,6 @@ public class Camera {
         recalculateProjectionMatrix();
     }
 
-    /**
-     * Zmienia parametr d (zoom) i przelicza macierz projekcji
-     */
     public void stepD(int value) {
         if (value > 0 && d - d_step > 0) {
             d -= d_step;
@@ -65,9 +62,6 @@ public class Camera {
         recalculateProjectionMatrix();
     }
 
-    /**
-     * Przelicza macierz projekcji na podstawie aktualnych parametrów
-     */
     public void recalculateProjectionMatrix() {
         float f = (float) (1.0f / Math.tan(d / 2.0f));
 
@@ -82,14 +76,9 @@ public class Camera {
         projectionMatrix.set(3, 2, 1.0f);
     }
 
-    /**
-     * Przelicza macierz widoku na podstawie aktualnej pozycji i orientacji kamery
-     */
     public void recalculateViewMatrix() {
-        // Tworzenie macierzy rotacji z wektorów bazy kamery
         SimpleMatrix rotation = new SimpleMatrix(3, 3);
 
-        // Ustawienie kolumn macierzy rotacji jako wektorów bazy kamery
         for (int i = 0; i < 3; i++) {
             rotation.set(i, 0, cameraRight.get(i));
             rotation.set(i, 1, cameraUp.get(i));
@@ -122,9 +111,9 @@ public class Camera {
         return projectionMatrix.mult(viewMatrix).mult(point);
     }
 
-    public void moveCameraRight(int align) {
+    public void moveCameraRight(int shift) {
         SimpleMatrix displacement = cameraRight.scale(cameraStep);
-        if (align > 0) {
+        if (shift > 0) {
             cameraPosition = cameraPosition.plus(displacement);
         } else {
             cameraPosition = cameraPosition.minus(displacement);
@@ -132,9 +121,9 @@ public class Camera {
         recalculateViewMatrix();
     }
 
-    public void moveCameraForward(int align) {
+    public void moveCameraForward(int shift) {
         SimpleMatrix displacement = cameraForward.scale(cameraStep);
-        if (align > 0) {
+        if (shift > 0) {
             cameraPosition = cameraPosition.plus(displacement);
         } else {
             cameraPosition = cameraPosition.minus(displacement);
@@ -142,9 +131,9 @@ public class Camera {
         recalculateViewMatrix();
     }
 
-    public void moveCameraUp(int align) {
+    public void moveCameraUp(int shift) {
         SimpleMatrix displacement = cameraUp.scale(cameraStep);
-        if (align > 0) {
+        if (shift > 0) {
             cameraPosition = cameraPosition.plus(displacement);
         } else {
             cameraPosition = cameraPosition.minus(displacement);
