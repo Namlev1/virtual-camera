@@ -1,36 +1,24 @@
 package src;
 
+import lombok.Data;
 import org.ejml.simple.SimpleMatrix;
-import java.awt.Graphics;
 
+@Data
 public class Renderer {
     private Camera camera;
     private java.awt.Graphics graphics;
 
-    /**
-     * Konstruktor renderera
-     * @param camera Kamera używana do widoku
-     * @param graphics Obiekt graficzny do rysowania
-     */
     public Renderer(Camera camera, java.awt.Graphics graphics) {
         this.camera = camera;
         this.graphics = graphics;
     }
 
-    /**
-     * Rysuje kształt
-     * @param shape Kształt do narysowania
-     */
     public void drawShape(Shape shape) {
         for (Edge edge : shape.getEdges()) {
             drawEdge(edge);
         }
     }
 
-    /**
-     * Rysuje pojedynczą krawędź
-     * @param edge Krawędź do narysowania
-     */
     private void drawEdge(Edge edge) {
         // Konwersja punktów krawędzi na wektory jednorodne
         SimpleMatrix start = convertToHomogeneousCoordinates(edge.getStart());
@@ -65,8 +53,6 @@ public class Renderer {
 
     /**
      * Konwertuje punkt 3D do współrzędnych jednorodnych (4D)
-     * @param point Punkt 3D
-     * @return Wektor jednorodny 4D
      */
     private SimpleMatrix convertToHomogeneousCoordinates(SimpleMatrix point) {
         SimpleMatrix homogeneous = new SimpleMatrix(4, 1);
@@ -80,47 +66,5 @@ public class Renderer {
         homogeneous.set(3, 0, 1.0);
 
         return homogeneous;
-    }
-
-    /**
-     * Konwertuje punkt 3D do współrzędnych jednorodnych (4D)
-     * @param x Współrzędna x
-     * @param y Współrzędna y
-     * @param z Współrzędna z
-     * @return Wektor jednorodny 4D
-     */
-    private SimpleMatrix convertToHomogeneousCoordinates(float x, float y, float z) {
-        SimpleMatrix homogeneous = new SimpleMatrix(4, 1);
-
-        homogeneous.set(0, 0, x);
-        homogeneous.set(1, 0, y);
-        homogeneous.set(2, 0, z);
-        homogeneous.set(3, 0, 1.0);
-
-        return homogeneous;
-    }
-
-    /**
-     * Ustawia nowy obiekt graficzny do rysowania
-     * @param graphics Nowy obiekt graficzny
-     */
-    public void setGraphics(java.awt.Graphics graphics) {
-        this.graphics = graphics;
-    }
-
-    /**
-     * Zwraca kamerę używaną przez renderer
-     * @return Kamera
-     */
-    public Camera getCamera() {
-        return camera;
-    }
-
-    /**
-     * Ustawia nową kamerę
-     * @param camera Nowa kamera
-     */
-    public void setCamera(Camera camera) {
-        this.camera = camera;
     }
 }

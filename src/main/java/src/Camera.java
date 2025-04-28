@@ -1,8 +1,10 @@
 package src;
 
+import lombok.Data;
 import org.ejml.simple.SimpleMatrix;
 import org.apache.commons.math3.complex.Quaternion;
 
+@Data
 public class Camera {
     // Stałe dla kamery
     private float d;
@@ -24,12 +26,6 @@ public class Camera {
     private SimpleMatrix projectionMatrix;
     private SimpleMatrix viewMatrix;
 
-    /**
-     * Konstruktor kamery
-     * @param d parametr odległości dla projekcji perspektywicznej
-     * @param width szerokość ekranu
-     * @param height wysokość ekranu
-     */
     public Camera(float d, int width, int height) {
         this.d = d;
         this.WIDTH = width;
@@ -58,37 +54,7 @@ public class Camera {
     }
 
     /**
-     * Zwraca macierz projekcji
-     */
-    public SimpleMatrix getProjectionMatrix() {
-        return projectionMatrix;
-    }
-
-    /**
-     * Zwraca macierz widoku
-     */
-    public SimpleMatrix getViewMatrix() {
-        return viewMatrix;
-    }
-
-    /**
-     * Ustawia macierz projekcji
-     */
-    public void setProjectionMatrix(SimpleMatrix projectionMatrix) {
-        this.projectionMatrix = projectionMatrix;
-    }
-
-    /**
-     * Ustawia parametr d i przelicza macierz projekcji
-     */
-    public void setD(float d) {
-        this.d = d;
-        recalculateProjectionMatrix();
-    }
-
-    /**
      * Zmienia parametr d (zoom) i przelicza macierz projekcji
-     * @param value dodatni dla przybliżenia, ujemny dla oddalenia
      */
     public void stepD(int value) {
         if (value > 0 && d - d_step > 0) {
@@ -152,66 +118,40 @@ public class Camera {
         }
     }
 
-    /**
-     * Rzutuje punkt 3D na płaszczyznę 2D
-     * @param point punkt w przestrzeni 3D
-     * @return punkt po transformacji projekcji
-     */
     public SimpleMatrix projectPoint(SimpleMatrix point) {
         return projectionMatrix.mult(viewMatrix).mult(point);
     }
 
-    /**
-     * Przesuwa kamerę w prawo/lewo
-     * @param align kierunek: >0 w prawo, <0 w lewo
-     */
     public void moveCameraRight(int align) {
+        SimpleMatrix displacement = cameraRight.scale(cameraStep);
         if (align > 0) {
-            SimpleMatrix displacement = cameraRight.scale(cameraStep);
             cameraPosition = cameraPosition.plus(displacement);
         } else {
-            SimpleMatrix displacement = cameraRight.scale(cameraStep);
             cameraPosition = cameraPosition.minus(displacement);
         }
         recalculateViewMatrix();
     }
 
-    /**
-     * Przesuwa kamerę do przodu/tyłu
-     * @param align kierunek: >0 do przodu, <0 do tyłu
-     */
     public void moveCameraForward(int align) {
+        SimpleMatrix displacement = cameraForward.scale(cameraStep);
         if (align > 0) {
-            SimpleMatrix displacement = cameraForward.scale(cameraStep);
             cameraPosition = cameraPosition.plus(displacement);
         } else {
-            SimpleMatrix displacement = cameraForward.scale(cameraStep);
             cameraPosition = cameraPosition.minus(displacement);
         }
         recalculateViewMatrix();
     }
 
-    /**
-     * Przesuwa kamerę w górę/dół
-     * @param align kierunek: >0 w górę, <0 w dół
-     */
     public void moveCameraUp(int align) {
+        SimpleMatrix displacement = cameraUp.scale(cameraStep);
         if (align > 0) {
-            SimpleMatrix displacement = cameraUp.scale(cameraStep);
             cameraPosition = cameraPosition.plus(displacement);
         } else {
-            SimpleMatrix displacement = cameraUp.scale(cameraStep);
             cameraPosition = cameraPosition.minus(displacement);
         }
         recalculateViewMatrix();
     }
 
-    /**
-     * Obraca kamerę używając kwaternionów
-     * @param mouseX kąt obrotu wokół osi X w stopniach
-     * @param mouseY kąt obrotu wokół osi Y w stopniach 
-     * @param mouseZ kąt obrotu wokół osi Z w stopniach
-     */
     public void rotateCamera(int mouseX, int mouseY, int mouseZ) {
         // Konwersja kątów ze stopni na radiany
         float angleX = mouseX * (float) Math.PI / 180.0f;
@@ -223,16 +163,12 @@ public class Camera {
         double[] axisY = { cameraUp.get(0), cameraUp.get(1), cameraUp.get(2) };
         double[] axisZ = { cameraForward.get(0), cameraForward.get(1), cameraForward.get(2) };
 
-        // Tworzenie kwaternionów dla każdej osi obrotu
         Quaternion qx = createQuaternionFromAxisAngle(axisX, angleX);
         Quaternion qy = createQuaternionFromAxisAngle(axisY, angleY);
         Quaternion qz = createQuaternionFromAxisAngle(axisZ, angleZ);
 
-        // Łączenie kwaternionów w jeden (mnożenie kwaternionów)
-        // Kolejność mnożenia ma znaczenie: najpierw qy, potem qx, na końcu qz
         Quaternion q = qy.multiply(qx).multiply(qz);
 
-        // Zastosowanie kwaterniona do wektorów bazowych kamery
         double[] forwardRotated = rotateVectorByQuaternion(
                 new double[] { cameraForward.get(0), cameraForward.get(1), cameraForward.get(2) }, q);
         double[] rightRotated = rotateVectorByQuaternion(
@@ -251,7 +187,7 @@ public class Camera {
                 (float)upRotated[0], (float)upRotated[1], (float)upRotated[2]
         });
 
-        // Normalizacja wektorów bazowych, aby zachować ortonormalność
+        // Normalizacja
         cameraForward = normalizeVector(cameraForward);
         cameraUp = normalizeVector(cameraUp);
         cameraRight = normalizeVector(cameraRight);
@@ -265,16 +201,9 @@ public class Camera {
         cameraUp = crossProduct(cameraForward, cameraRight);
         cameraUp = normalizeVector(cameraUp);
 
-        // Aktualizacja macierzy widoku
         recalculateViewMatrix();
     }
 
-    /**
-     * Tworzy kwaternion z osi obrotu i kąta
-     * @param axis oś obrotu
-     * @param angle kąt obrotu w radianach
-     * @return kwaternion reprezentujący obrót
-     */
     private Quaternion createQuaternionFromAxisAngle(double[] axis, double angle) {
         // Normalizacja osi
         double length = Math.sqrt(axis[0] * axis[0] + axis[1] * axis[1] + axis[2] * axis[2]);
@@ -287,7 +216,6 @@ public class Camera {
         double halfAngle = angle / 2.0;
         double sinHalfAngle = Math.sin(halfAngle);
 
-        // Tworzenie kwaterniona (w, x, y, z)
         double w = Math.cos(halfAngle);
         double x = axis[0] * sinHalfAngle;
         double y = axis[1] * sinHalfAngle;
@@ -296,23 +224,13 @@ public class Camera {
         return new Quaternion(w, x, y, z);
     }
 
-    /**
-     * Obraca wektor używając kwaterniona
-     * @param v wektor do obrócenia
-     * @param q kwaternion reprezentujący obrót
-     * @return obrócony wektor
-     */
     private double[] rotateVectorByQuaternion(double[] v, Quaternion q) {
-        // Konwersja wektora 3D do kwaterniona (składowa skalarna = 0)
         Quaternion vq = new Quaternion(0, v[0], v[1], v[2]);
-
-        // Obliczenie sprzężenia kwaterniona
         Quaternion qConj = q.getConjugate();
 
         // Rotacja: q * vq * q^-1
         Quaternion rotated = q.multiply(vq).multiply(qConj);
 
-        // Wyodrębnienie składowych wektora z kwaterniona
         return new double[] { rotated.getQ1(), rotated.getQ2(), rotated.getQ3() };
     }
 
@@ -329,9 +247,6 @@ public class Camera {
         return result;
     }
 
-    /**
-     * Normalizuje wektor 3D
-     */
     private SimpleMatrix normalizeVector(SimpleMatrix vector) {
         float length = (float) Math.sqrt(
                 vector.get(0) * vector.get(0) +
@@ -353,9 +268,5 @@ public class Camera {
 
     public int getHeight() {
         return HEIGHT;
-    }
-
-    public float getD() {
-        return d;
     }
 }

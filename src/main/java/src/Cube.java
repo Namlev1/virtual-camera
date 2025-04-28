@@ -1,33 +1,18 @@
 package src;
 
-/**
- * Klasa reprezentująca prostopadłościan
- */
 public class Cube extends Shape {
-    /**
-     * Konstruktor prostopadłościanu
-     * @param centerX Współrzędna x środka
-     * @param centerY Współrzędna y środka
-     * @param centerZ Współrzędna z środka
-     * @param width Szerokość
-     * @param height Wysokość
-     * @param depth Głębokość
-     */
     public Cube(float centerX, float centerY, float centerZ, float width, float height, float depth) {
         super();
         createCube(centerX, centerY, centerZ, width, height, depth);
     }
 
-    /**
-     * Tworzy krawędzie prostopadłościanu
-     */
     private void createCube(float centerX, float centerY, float centerZ, float width, float height, float depth) {
         float halfWidth = width / 2;
         float halfHeight = height / 2;
         float halfDepth = depth / 2;
 
         // Wierzchołki prostopadłościanu
-        float[][] vertices = new float[][] {
+        float[][] vertices = new float[][]{
                 {centerX - halfWidth, centerY - halfHeight, centerZ - halfDepth}, // 0: lewy dolny tył
                 {centerX + halfWidth, centerY - halfHeight, centerZ - halfDepth}, // 1: prawy dolny tył
                 {centerX + halfWidth, centerY + halfHeight, centerZ - halfDepth}, // 2: prawy górny tył
