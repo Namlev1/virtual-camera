@@ -22,10 +22,10 @@ public class Main extends JPanel {
         renderer = new Renderer(camera, null);
 
         shapes = new ArrayList<>();
-        shapes.add(new Cube(-1.5f, -1.5f, 4.0f, 1.0f, 1.0f, 1.0f));  // Lewa dolna
-        shapes.add(new Cube(1.5f, -1.5f, 4.0f, 1.0f, 1.0f, 1.0f));   // Prawa dolna
-        shapes.add(new Cube(-1.5f, 1.5f, 4.0f, 1.0f, 1.0f, 1.0f));   // Lewa górna
-        shapes.add(new Cube(1.5f, 1.5f, 4.0f, 1.0f, 1.0f, 1.0f));    // Prawa górna
+        shapes.add(new Cube(-1f, -1f, 4.0f, 1.0f, 1.0f, 1.0f));  // Lewa dolna
+        shapes.add(new Cube(1f, -1f, 4.0f, 1.0f, 1.0f, 1.0f));   // Prawa dolna
+        shapes.add(new Cube(-1f, 1f, 4.0f, 1.0f, 1.0f, 1.0f));   // Lewa górna
+        shapes.add(new Cube(1f, 1f, 4.0f, 1.0f, 1.0f, 1.0f));    // Prawa górna
 
         setFocusable(true);
         addKeyListener(new KeyAdapter() {
