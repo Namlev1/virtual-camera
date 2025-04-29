@@ -7,10 +7,13 @@ import org.apache.commons.math3.complex.Quaternion;
 @Data
 public class Camera {
     // Stałe dla kamery
-    private float d;
-    private float d_step = 0.05f;
-    private float near = 0.1f;
-    private float far = 100.0f;
+    private float d = 5.0f;  // Odległość rzutni od środka rzutowania
+    private float d_step = 0.1f;  // Krok zmiany parametru d
+    private float fov = 60.0f;  // Pole widzenia w stopniach
+//    private float d;
+//    private float d_step = 0.05f;
+//    private float near = 0.1f;
+//    private float far = 100.0f;
     private float widthToHeightRatio;
     private int WIDTH;
     private int HEIGHT;
@@ -54,28 +57,37 @@ public class Camera {
     }
 
     public void stepD(int value) {
-        if (value > 0 && d - d_step > 0) {
-            d -= d_step;
-        } else if (value < 0) {
-            d += d_step;
+        if (value > 0) {  // Przybliżenie
+            fov = Math.max(fov - 5.0f, 20.0f);  // Min FOV: 20 stopni
+        } else if (value < 0) {  // Oddalenie
+            fov = Math.min(fov + 5.0f, 120.0f);  // Max FOV: 120 stopni
         }
         recalculateProjectionMatrix();
     }
+    
+//    public void stepD(int value) {
+//        if (value > 0 && d - d_step > 0) {
+//            d -= d_step;
+//        } else if (value < 0) {
+//            d += d_step;
+//        }
+//        recalculateProjectionMatrix();
+//    }
 
     public void recalculateProjectionMatrix() {
-        float f = (float) (1.0f / Math.tan(d / 2.0f));
-
         // Zerowanie macierzy
         projectionMatrix = new SimpleMatrix(4, 4);
 
-        // Ustawienie wartości macierzy projekcji
-        projectionMatrix.set(0, 0, f / widthToHeightRatio);
-        projectionMatrix.set(1, 1, f);
-        projectionMatrix.set(2, 2, (far + near) / (far - near));
-        projectionMatrix.set(2, 3, 2 * far * near / (far - near));
-        projectionMatrix.set(3, 2, 1.0f);
-    }
+        // Obliczenie współczynnika skalowania FOV
+        float fovScale = (float) (Math.tan(Math.toRadians(fov) / 2) / Math.tan(Math.toRadians(60) / 2));
 
+        // Ustawienie wartości macierzy projekcji (uproszczona wersja)
+        projectionMatrix.set(0, 0, 1.0f);
+        projectionMatrix.set(1, 1, 1.0f);
+        projectionMatrix.set(2, 2, 1.0f);
+        projectionMatrix.set(3, 2, fovScale / d);  // Współczynnik perspektywy
+    }
+    
     public void recalculateViewMatrix() {
         SimpleMatrix rotation = new SimpleMatrix(3, 3);
 
@@ -248,14 +260,5 @@ public class Camera {
         }
 
         return vector.scale(1.0f / length);
-    }
-
-    // Gettery
-    public int getWidth() {
-        return WIDTH;
-    }
-
-    public int getHeight() {
-        return HEIGHT;
     }
 }
