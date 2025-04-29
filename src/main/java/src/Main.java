@@ -82,10 +82,10 @@ public class Main extends JPanel {
 
             // Zmiana FOV (zoom)
             case KeyEvent.VK_CLOSE_BRACKET:  // Zoom in ]
-                camera.stepD(1);
+                camera.changeZoom(1);
                 break;
             case KeyEvent.VK_OPEN_BRACKET:  // Zoom out [
-                camera.stepD(-1);
+                camera.changeZoom(-1);
                 break;
         }
 

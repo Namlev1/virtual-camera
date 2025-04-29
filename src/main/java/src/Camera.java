@@ -6,26 +6,20 @@ import org.apache.commons.math3.complex.Quaternion;
 
 @Data
 public class Camera {
-    // Stałe dla kamery
-    private float d = 5.0f;  // Odległość rzutni od środka rzutowania
-    private float d_step = 0.1f;  // Krok zmiany parametru d
-    private float fov = 60.0f;  // Pole widzenia w stopniach
-//    private float d;
-//    private float d_step = 0.05f;
-//    private float near = 0.1f;
-//    private float far = 100.0f;
+    private float d = 5.0f;
+    private float d_step = 0.1f;
+    private float fov = 60.0f;
+    
     private float widthToHeightRatio;
     private int WIDTH;
     private int HEIGHT;
 
-    // Wektory określające pozycję i orientację kamery
     private SimpleMatrix cameraPosition;
     private SimpleMatrix cameraForward;
     private SimpleMatrix cameraUp;
     private SimpleMatrix cameraRight;
     private float cameraStep = 0.2f;
 
-    // Macierze projekcji i widoku
     private SimpleMatrix projectionMatrix;
     private SimpleMatrix viewMatrix;
 
@@ -35,53 +29,35 @@ public class Camera {
         this.HEIGHT = height;
         this.widthToHeightRatio = (float) width / (float) height;
 
-        // Inicjalizacja wektorów kamery
         this.cameraPosition = new SimpleMatrix(3, 1, true, new float[]{0.0f, 0.0f, 0.0f});
         this.cameraForward = new SimpleMatrix(3, 1, true, new float[]{0.0f, 0.0f, 1.0f});
         this.cameraUp = new SimpleMatrix(3, 1, true, new float[]{0.0f, 1.0f, 0.0f});
         this.cameraRight = new SimpleMatrix(3, 1, true, new float[]{1.0f, 0.0f, 0.0f});
 
-        // Inicjalizacja macierzy projekcji
         this.projectionMatrix = new SimpleMatrix(4, 4);
 
-        // Inicjalizacja macierzy widoku jako macierzy jednostkowej
         this.viewMatrix = SimpleMatrix.identity(4);
-
-        // Ustawienie pozycji kamery w macierzy widoku
         viewMatrix.set(0, 3, cameraPosition.get(0));
         viewMatrix.set(1, 3, cameraPosition.get(1));
         viewMatrix.set(2, 3, cameraPosition.get(2));
 
-        // Przeliczenie macierzy projekcji
         recalculateProjectionMatrix();
     }
 
-    public void stepD(int value) {
-        if (value > 0) {  // Przybliżenie
+    public void changeZoom(int value) {
+        if (value > 0) {
             fov = Math.max(fov - 5.0f, 20.0f);  // Min FOV: 20 stopni
-        } else if (value < 0) {  // Oddalenie
+        } else if (value < 0) {
             fov = Math.min(fov + 5.0f, 120.0f);  // Max FOV: 120 stopni
         }
         recalculateProjectionMatrix();
     }
     
-//    public void stepD(int value) {
-//        if (value > 0 && d - d_step > 0) {
-//            d -= d_step;
-//        } else if (value < 0) {
-//            d += d_step;
-//        }
-//        recalculateProjectionMatrix();
-//    }
-
     public void recalculateProjectionMatrix() {
-        // Zerowanie macierzy
         projectionMatrix = new SimpleMatrix(4, 4);
 
-        // Obliczenie współczynnika skalowania FOV
         float fovScale = (float) (Math.tan(Math.toRadians(fov) / 2) / Math.tan(Math.toRadians(60) / 2));
 
-        // Ustawienie wartości macierzy projekcji (uproszczona wersja)
         projectionMatrix.set(0, 0, 1.0f);
         projectionMatrix.set(1, 1, 1.0f);
         projectionMatrix.set(2, 2, 1.0f);
@@ -97,23 +73,16 @@ public class Camera {
             rotation.set(i, 2, cameraForward.get(i));
         }
 
-        // Transponowanie macierzy rotacji
         SimpleMatrix rotationTransposed = rotation.transpose();
-
-        // Obliczenie części translacyjnej macierzy widoku
         SimpleMatrix translationPart = rotationTransposed.mult(cameraPosition).negative();
-
-        // Inicjalizacja macierzy widoku jako macierzy jednostkowej
         viewMatrix = SimpleMatrix.identity(4);
 
-        // Ustawienie części rotacyjnej (3x3 w lewym górnym rogu)
         for (int i = 0; i < 3; i++) {
             for (int j = 0; j < 3; j++) {
                 viewMatrix.set(i, j, rotationTransposed.get(i, j));
             }
         }
 
-        // Ustawienie części translacyjnej (pierwsze 3 elementy ostatniej kolumny)
         for (int i = 0; i < 3; i++) {
             viewMatrix.set(i, 3, translationPart.get(i));
         }
@@ -154,12 +123,10 @@ public class Camera {
     }
 
     public void rotateCamera(int mouseX, int mouseY, int mouseZ) {
-        // Konwersja kątów ze stopni na radiany
         float angleX = mouseX * (float) Math.PI / 180.0f;
         float angleY = mouseY * (float) Math.PI / 180.0f;
         float angleZ = mouseZ * (float) Math.PI / 180.0f;
 
-        // Pobieranie aktualnych osi kamery jako osi obrotu
         double[] axisX = { cameraRight.get(0), cameraRight.get(1), cameraRight.get(2) };
         double[] axisY = { cameraUp.get(0), cameraUp.get(1), cameraUp.get(2) };
         double[] axisZ = { cameraForward.get(0), cameraForward.get(1), cameraForward.get(2) };
@@ -177,7 +144,6 @@ public class Camera {
         double[] upRotated = rotateVectorByQuaternion(
                 new double[] { cameraUp.get(0), cameraUp.get(1), cameraUp.get(2) }, q);
 
-        // Aktualizacja wektorów bazowych kamery
         cameraForward = new SimpleMatrix(3, 1, true, new float[] {
                 (float)forwardRotated[0], (float)forwardRotated[1], (float)forwardRotated[2]
         });
@@ -188,17 +154,13 @@ public class Camera {
                 (float)upRotated[0], (float)upRotated[1], (float)upRotated[2]
         });
 
-        // Normalizacja
         cameraForward = normalizeVector(cameraForward);
         cameraUp = normalizeVector(cameraUp);
         cameraRight = normalizeVector(cameraRight);
 
-        // Po rotacji musimy upewnić się, że wektory bazy pozostają ortogonalne
-        // Poprawiamy wektor "right" jako iloczyn wektorowy "forward" i "up"
         cameraRight = crossProduct(cameraUp, cameraForward);
         cameraRight = normalizeVector(cameraRight);
 
-        // Następnie poprawiamy wektor "up" jako iloczyn wektorowy "forward" i "right"
         cameraUp = crossProduct(cameraForward, cameraRight);
         cameraUp = normalizeVector(cameraUp);
 
@@ -206,7 +168,6 @@ public class Camera {
     }
 
     private Quaternion createQuaternionFromAxisAngle(double[] axis, double angle) {
-        // Normalizacja osi
         double length = Math.sqrt(axis[0] * axis[0] + axis[1] * axis[1] + axis[2] * axis[2]);
         if (length > 1e-6) {
             axis[0] /= length;
@@ -229,15 +190,12 @@ public class Camera {
         Quaternion vq = new Quaternion(0, v[0], v[1], v[2]);
         Quaternion qConj = q.getConjugate();
 
-        // Rotacja: q * vq * q^-1
+        // q * vq * q^-1
         Quaternion rotated = q.multiply(vq).multiply(qConj);
 
         return new double[] { rotated.getQ1(), rotated.getQ2(), rotated.getQ3() };
     }
 
-    /**
-     * Oblicza iloczyn wektorowy dwóch wektorów 3D
-     */
     private SimpleMatrix crossProduct(SimpleMatrix a, SimpleMatrix b) {
         SimpleMatrix result = new SimpleMatrix(3, 1);
 
@@ -256,7 +214,7 @@ public class Camera {
         );
 
         if (length < 1e-6f) {
-            return vector;  // Unikanie dzielenia przez zero
+            return vector;
         }
 
         return vector.scale(1.0f / length);
