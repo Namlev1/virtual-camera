@@ -26,8 +26,8 @@ public class Main extends JPanel {
 //        shapes.add(new Cube(1f, -1f, 4.0f, 1.0f, 1.0f, 1.0f));   // Prawa dolna
 //        shapes.add(new Cube(-1f, 1f, 4.0f, 1.0f, 1.0f, 1.0f));   // Lewa górna
 //        shapes.add(new Cube(1f, 1f, 4.0f, 1.0f, 1.0f, 1.0f));    // Prawa górna
-        shapes.add(new Face(-10, -10, 5, 5, 30)); // przedni
-        shapes.add(new Face(0, 0, 10, 10, 50)); // tylni
+        shapes.add(new Face(-10, -10, 5, 5, 30, Color.red)); // przedni
+        shapes.add(new Face(0, 0, 10, 10, 50, Color.blue)); // tylni
 
         setFocusable(true);
         addKeyListener(new KeyAdapter() {
@@ -106,8 +106,8 @@ public class Main extends JPanel {
         renderer.setGraphics(g);
 
         // Renderowanie wszystkich kształtów
-        for (Shape cube : shapes) {
-            renderer.drawShape(cube);
+        for (Shape shape : shapes) {
+            renderer.drawShape(shape);
         }
     }
 

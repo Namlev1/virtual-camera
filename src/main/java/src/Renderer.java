@@ -3,6 +3,8 @@ package src;
 import lombok.Data;
 import org.ejml.simple.SimpleMatrix;
 
+import java.awt.*;
+
 @Data
 public class Renderer {
     private Camera camera;
@@ -14,9 +16,49 @@ public class Renderer {
     }
 
     public void drawShape(Shape shape) {
+        if (shape instanceof Face) {
+            Face face = (Face) shape;
+            fillFace(face);
+        }
+        
         for (Edge edge : shape.getEdges()) {
             drawEdge(edge);
         }
+    }
+    
+    private void fillFace(Face face) {
+        // Wierzchołki ściany
+        Edge[] edges = face.getEdges().toArray(new Edge[0]);
+
+        // Rzutowanie punktów na płaszczyznę
+        int[] xPoints = new int[4];
+        int[] yPoints = new int[4];
+
+        for (int i = 0; i < 4; i++) {
+            SimpleMatrix point = convertToHomogeneousCoordinates(edges[i].getStart());
+            SimpleMatrix pointView = camera.getViewMatrix().mult(point);
+
+            if (pointView.get(2) <= 0) {
+                return;
+            }
+
+            SimpleMatrix pointClip = camera.getProjectionMatrix().mult(pointView);
+            float xNdc = (float) (pointClip.get(0) / pointClip.get(3));
+            float yNdc = (float) (pointClip.get(1) / pointClip.get(3));
+
+            int screenWidth = camera.getWIDTH();
+            int screenHeight = camera.getHEIGHT();
+            xPoints[i] = (int) (screenWidth / 2 + xNdc * screenHeight / 2);
+            yPoints[i] = (int) (screenHeight / 2 - yNdc * screenHeight / 2);
+        }
+
+        // Kolorowanie
+        Color oldColor = graphics.getColor();
+        graphics.setColor(face.getColor());
+        
+        graphics.fillPolygon(xPoints, yPoints, 4);
+
+        graphics.setColor(oldColor);
     }
 
     private void drawEdge(Edge edge) {

@@ -1,8 +1,16 @@
 package src;
 
+import lombok.Data;
+
+import java.awt.*;
+
+@Data
 public class Face extends Shape {
-    public Face(float x1, float y1, float x2, float y2, float z) {
+    private final Color color;
+    
+    public Face(float x1, float y1, float x2, float y2, float z, Color color) {
         super();
+        this.color = color;
         createFace(x1, y1, x2, y2, z);
     }
 
