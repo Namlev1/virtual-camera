@@ -13,7 +13,7 @@ public class Main extends JPanel {
 
     private final Camera camera;
     private final Renderer renderer;
-    private final List<Cube> shapes;
+    private final List<Shape> shapes;
 
     public Main() {
         // Inicjalizacja kamery z początkowym parametrem d = 2.0
@@ -22,10 +22,12 @@ public class Main extends JPanel {
         renderer = new Renderer(camera, null);
 
         shapes = new ArrayList<>();
-        shapes.add(new Cube(-1f, -1f, 4.0f, 1.0f, 1.0f, 1.0f));  // Lewa dolna
-        shapes.add(new Cube(1f, -1f, 4.0f, 1.0f, 1.0f, 1.0f));   // Prawa dolna
-        shapes.add(new Cube(-1f, 1f, 4.0f, 1.0f, 1.0f, 1.0f));   // Lewa górna
-        shapes.add(new Cube(1f, 1f, 4.0f, 1.0f, 1.0f, 1.0f));    // Prawa górna
+//        shapes.add(new Cube(-1f, -1f, 4.0f, 1.0f, 1.0f, 1.0f));  // Lewa dolna
+//        shapes.add(new Cube(1f, -1f, 4.0f, 1.0f, 1.0f, 1.0f));   // Prawa dolna
+//        shapes.add(new Cube(-1f, 1f, 4.0f, 1.0f, 1.0f, 1.0f));   // Lewa górna
+//        shapes.add(new Cube(1f, 1f, 4.0f, 1.0f, 1.0f, 1.0f));    // Prawa górna
+        shapes.add(new Face(-10, -10, 5, 5, 30)); // przedni
+        shapes.add(new Face(0, 0, 10, 10, 50)); // tylni
 
         setFocusable(true);
         addKeyListener(new KeyAdapter() {
@@ -104,7 +106,7 @@ public class Main extends JPanel {
         renderer.setGraphics(g);
 
         // Renderowanie wszystkich kształtów
-        for (Cube cube : shapes) {
+        for (Shape cube : shapes) {
             renderer.drawShape(cube);
         }
     }
