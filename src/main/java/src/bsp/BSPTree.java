@@ -12,9 +12,6 @@ import java.util.List;
 public class BSPTree {
     private BSPNode root;
 
-    /**
-     * Build a BSP tree from a list of faces
-     */
     public BSPTree(List<Face> faces) {
         if (faces == null || faces.isEmpty()) {
             root = null;
@@ -24,15 +21,11 @@ public class BSPTree {
         root = buildTree(new ArrayList<>(faces));
     }
 
-    /**
-     * Recursively build the BSP tree
-     */
     private BSPNode buildTree(List<Face> faces) {
         if (faces.isEmpty()) {
             return null;
         }
 
-        // Select first face as partitioner (more sophisticated selection methods could be used)
         Face partitioner = faces.get(0);
         faces.remove(0);
 
@@ -42,21 +35,20 @@ public class BSPTree {
         List<Face> frontList = new ArrayList<>();
         List<Face> backList = new ArrayList<>();
 
-        // Classify each face against the partition plane
         for (Face face : faces) {
             int classification = plane.classifyFace(face);
 
             switch (classification) {
-                case 0:  // Coplanar
+                case 0:
                     node.getCoplanarFaces().add(face);
                     break;
-                case 1:  // Front
+                case 1:
                     frontList.add(face);
                     break;
-                case -1: // Back
+                case -1:
                     backList.add(face);
                     break;
-                case 2:  // Straddling
+                case 2:
                     Face[] splitFaces = plane.splitFace(face);
                     frontList.add(splitFaces[0]);
                     backList.add(splitFaces[1]);
@@ -64,7 +56,6 @@ public class BSPTree {
             }
         }
 
-        // Recursively build front and back subtrees
         if (!frontList.isEmpty()) {
             node.setFront(buildTree(frontList));
         }
@@ -76,9 +67,6 @@ public class BSPTree {
         return node;
     }
 
-    /**
-     * Render the scene using BSP tree ordering
-     */
     public void render(Renderer renderer, SimpleMatrix cameraPosition) {
         if (root != null) {
             root.render(renderer, cameraPosition);

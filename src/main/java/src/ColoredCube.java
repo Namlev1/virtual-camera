@@ -7,35 +7,11 @@ import java.util.List;
 public class ColoredCube {
     private List<Face> faces;
 
-    /**
-     * Creates a cube made of 6 colored faces for proper BSP rendering
-     */
-    public ColoredCube(float centerX, float centerY, float centerZ,
-                       float width, float height, float depth,
-                       Color frontColor, Color backColor, Color leftColor,
-                       Color rightColor, Color topColor, Color bottomColor) {
-        faces = new ArrayList<>();
-        createCubeFaces(centerX, centerY, centerZ, width, height, depth,
-                frontColor, backColor, leftColor, rightColor, topColor, bottomColor);
-    }
-
-    /**
-     * Creates a cube with all faces the same color
-     */
-    public ColoredCube(float centerX, float centerY, float centerZ,
-                       float width, float height, float depth, Color color) {
-        this(centerX, centerY, centerZ, width, height, depth,
-                color, color, color, color, color, color);
-    }
-
-    /**
-     * Creates a cube with randomly colored faces
-     */
     public ColoredCube(float centerX, float centerY, float centerZ,
                        float width, float height, float depth) {
         faces = new ArrayList<>();
 
-        // Generate random colors for each face
+        // Losowanie kolorów
         Color frontColor = new Color((float)Math.random(), (float)Math.random(), (float)Math.random(), 1.0f);
         Color backColor = new Color((float)Math.random(), (float)Math.random(), (float)Math.random(), 1.0f);
         Color leftColor = new Color((float)Math.random(), (float)Math.random(), (float)Math.random(), 1.0f);
@@ -55,7 +31,7 @@ public class ColoredCube {
         float halfHeight = height / 2;
         float halfDepth = depth / 2;
 
-        // Calculate the eight vertices of the cube
+        // Obliczanie wierzchołków
         float x1 = centerX - halfWidth;  // Left
         float x2 = centerX + halfWidth;  // Right
         float y1 = centerY - halfHeight; // Bottom
@@ -63,7 +39,7 @@ public class ColoredCube {
         float z1 = centerZ - halfDepth;  // Back
         float z2 = centerZ + halfDepth;  // Front
 
-        // Front face (Z+) - vertices in counter-clockwise order
+        // Przednia ściana
         faces.add(new Face(new float[] {
                 x1, y2, z2,  // top-left
                 x2, y2, z2,  // top-right
@@ -71,7 +47,7 @@ public class ColoredCube {
                 x1, y1, z2   // bottom-left
         }, frontColor));
 
-        // Back face (Z-) - vertices in counter-clockwise order (when viewed from outside)
+        // Tylnia ściana
         faces.add(new Face(new float[] {
                 x2, y2, z1,  // top-right
                 x1, y2, z1,  // top-left
@@ -79,7 +55,7 @@ public class ColoredCube {
                 x2, y1, z1   // bottom-right
         }, backColor));
 
-        // Left face (X-)
+        // Lewa ściana
         faces.add(new Face(new float[] {
                 x1, y2, z1,  // top-back
                 x1, y2, z2,  // top-front
@@ -87,7 +63,7 @@ public class ColoredCube {
                 x1, y1, z1   // bottom-back
         }, leftColor));
 
-        // Right face (X+)
+        // Prawa ściana
         faces.add(new Face(new float[] {
                 x2, y2, z2,  // top-front
                 x2, y2, z1,  // top-back
@@ -95,7 +71,7 @@ public class ColoredCube {
                 x2, y1, z2   // bottom-front
         }, rightColor));
 
-        // Top face (Y+)
+        // Górna ściana
         faces.add(new Face(new float[] {
                 x1, y2, z1,  // left-back
                 x2, y2, z1,  // right-back
@@ -103,7 +79,7 @@ public class ColoredCube {
                 x1, y2, z2   // left-front
         }, topColor));
 
-        // Bottom face (Y-)
+        // Dolna ściana
         faces.add(new Face(new float[] {
                 x1, y1, z2,  // left-front
                 x2, y1, z2,  // right-front
@@ -112,9 +88,6 @@ public class ColoredCube {
         }, bottomColor));
     }
 
-    /**
-     * Returns all the faces of this cube
-     */
     public List<Face> getFaces() {
         return faces;
     }

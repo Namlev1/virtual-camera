@@ -23,37 +23,24 @@ public class Renderer {
         this.faces = new ArrayList<>();
     }
 
-    /**
-     * Enable or disable BSP-based hidden surface removal
-     */
     public void setBSPEnabled(boolean enabled) {
         this.bspEnabled = enabled;
-        // Ensure BSP tree is built if we're enabling it
         if (enabled) {
             ensureBSPTreeBuilt();
         }
     }
 
-    /**
-     * Add a face to be rendered with BSP
-     */
     public void addFace(Face face) {
         faces.add(face);
         rebuildRequired = true;
     }
 
-    /**
-     * Clear all faces from the renderer
-     */
     public void clearFaces() {
         faces.clear();
         bspTree = null;
         rebuildRequired = false;
     }
 
-    /**
-     * Rebuild the BSP tree if necessary
-     */
     private void ensureBSPTreeBuilt() {
         if (rebuildRequired || bspTree == null) {
             bspTree = new BSPTree(new ArrayList<>(faces));
@@ -61,83 +48,57 @@ public class Renderer {
         }
     }
 
-    /**
-     * Draw a shape with or without BSP depending on settings
-     */
     public void drawShape(Shape shape) {
         if (shape instanceof Face) {
             Face face = (Face) shape;
 
-            // If BSP is enabled, add to list for BSP rendering
             if (bspEnabled) {
-                // This face will be rendered later with BSP
                 addFace(face);
             } else {
-                // No BSP, render immediately
                 drawFaceDirectly(face);
             }
         } else {
-            // For non-Face shapes (like lines), just draw directly
             for (Edge edge : shape.getEdges()) {
                 drawEdge(edge);
             }
         }
     }
 
-    /**
-     * Draw a face directly without BSP (original implementation)
-     */
     private void drawFaceDirectly(Face face) {
-        // First fill the face
         fillFace(face);
 
-        // Then draw edges
         for (Edge edge : face.getEdges()) {
             drawEdge(edge);
         }
     }
 
-    /**
-     * Render all faces using BSP tree for correct depth sorting
-     * Call this after all shapes have been added
-     */
     public void renderWithBSP() {
-        // Make sure BSP tree is up to date
         ensureBSPTreeBuilt();
 
         if (bspTree != null && !faces.isEmpty()) {
-            // Use the BSP tree to render faces in correct order
             bspTree.render(this, camera.getCameraPosition());
 
-            // Clear the face list since they've been rendered
             clearFaces();
         }
     }
 
-    /**
-     * Normal drawing methods (from original Renderer)
-     */
     public void fillFace(Face face) {
-        // Get all edges of the face
         List<Edge> edges = face.getEdges();
         int numVertices = edges.size();
 
         if (numVertices < 3) {
-            return; // Need at least 3 vertices to form a face
+            return;
         }
 
-        // Arrays to store screen coordinates
         int[] xPoints = new int[numVertices];
         int[] yPoints = new int[numVertices];
 
-        // Project each vertex to screen space
         for (int i = 0; i < numVertices; i++) {
             SimpleMatrix point = convertToHomogeneousCoordinates(edges.get(i).getStart());
             SimpleMatrix pointView = camera.getViewMatrix().mult(point);
 
-            // Check if point is behind camera
             if (pointView.get(2) <= 0) {
-                return; // Don't render faces with any vertices behind camera
+                return;
             }
 
             SimpleMatrix pointClip = camera.getProjectionMatrix().mult(pointView);
@@ -151,14 +112,11 @@ public class Renderer {
             yPoints[i] = (int) (screenHeight / 2 - yNdc * screenHeight / 2);
         }
 
-        // Set the face color
         Color oldColor = graphics.getColor();
         graphics.setColor(face.getColor());
 
-        // Fill the polygon
         graphics.fillPolygon(xPoints, yPoints, numVertices);
 
-        // Restore the original color
         graphics.setColor(oldColor);
     }
 

@@ -13,25 +13,22 @@ public class Main extends JPanel {
 
     private final Camera camera;
     private final Renderer renderer;
-    private final List<Face> allFaces; // Store all faces from all cubes
-    private boolean bspEnabled = true; // Enable BSP by default
-    private boolean wireframeMode = false; // Toggle for wireframe mode
+    private final List<Face> allFaces;
+    private boolean bspEnabled = true;
+    private boolean wireframeMode = false;
 
     public Main() {
         // Inicjalizacja kamery z początkowym parametrem d = 2.0
         camera = new Camera(2.0f, WIDTH, HEIGHT);
 
-        // Set up camera position to see all cubes
         camera.setCameraPosition(new org.ejml.simple.SimpleMatrix(3, 1, true,
                 new float[]{0.0f, 0.0f, 0.0f}));
         camera.recalculateViewMatrix();
 
         renderer = new Renderer(camera, null);
 
-        // Create a list to store all faces
         allFaces = new ArrayList<>();
 
-        // Add cubes to the scene
         addCubeToScene(-1f, -1f, 4.0f, 1.0f, 1.0f, 1.0f);  // Lewa dolna
         addCubeToScene(1f, -1f, 4.0f, 1.0f, 1.0f, 1.0f);   // Prawa dolna
         addCubeToScene(-1f, 1f, 4.0f, 1.0f, 1.0f, 1.0f);   // Lewa górna
@@ -46,14 +43,9 @@ public class Main extends JPanel {
         });
     }
 
-    /**
-     * Adds a colored cube to the scene at the specified position
-     */
     private void addCubeToScene(float x, float y, float z, float width, float height, float depth) {
-        // Create a cube with random colors for each face
         ColoredCube cube = new ColoredCube(x, y, z, width, height, depth);
 
-        // Add all faces from this cube to our list of faces
         allFaces.addAll(cube.getFaces());
     }
 
@@ -97,7 +89,7 @@ public class Main extends JPanel {
             case KeyEvent.VK_SEMICOLON:  // Obrót przeciwnie do wskazówek zegara (;)
                 camera.rotateCamera(0, 0, 5);
                 break;
-            case KeyEvent.VK_Q:  // Obrót zgodnie z wskazówkami zegara (q)
+            case KeyEvent.VK_Q:  // Obrót zgodnie ze wskazówkami zegara (q)
                 camera.rotateCamera(0, 0, -5);
                 break;
 
@@ -107,18 +99,6 @@ public class Main extends JPanel {
                 break;
             case KeyEvent.VK_OPEN_BRACKET:  // Zoom out [
                 camera.changeZoom(-1);
-                break;
-
-            // Toggle BSP on/off
-            case KeyEvent.VK_B:  // Toggle BSP
-                bspEnabled = !bspEnabled;
-                System.out.println("BSP " + (bspEnabled ? "enabled" : "disabled"));
-                break;
-
-            // Toggle wireframe mode
-            case KeyEvent.VK_W:  // Toggle wireframe
-                wireframeMode = !wireframeMode;
-                System.out.println("Wireframe mode " + (wireframeMode ? "enabled" : "disabled"));
                 break;
         }
 
@@ -137,19 +117,16 @@ public class Main extends JPanel {
 
         renderer.setGraphics(g);
 
-        // Enable/disable BSP based on toggle
         renderer.setBSPEnabled(bspEnabled);
 
-        // Render the scene
+        // Rendering
         if (wireframeMode) {
-            // In wireframe mode, just draw the edges
             for (Face face : allFaces) {
                 for (Edge edge : face.getEdges()) {
                     renderer.drawEdge(edge);
                 }
             }
         } else {
-            // In solid mode, use BSP or direct rendering
             if (bspEnabled) {
                 for (Face face : allFaces) {
                     renderer.addFace(face);
@@ -161,17 +138,11 @@ public class Main extends JPanel {
                 }
             }
         }
-
-        // Draw information text
-        g.setColor(Color.BLACK);
-        g.drawString("BSP: " + (bspEnabled ? "ON" : "OFF") + " (B to toggle)", 10, 20);
-        g.drawString("Mode: " + (wireframeMode ? "Wireframe" : "Solid") + " (W to toggle)", 10, 40);
-        g.drawString("Use arrow keys to rotate, []/,'/. to move", 10, HEIGHT - 20);
     }
 
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {
-            JFrame frame = new JFrame("Wirtualna Kamera 3D with BSP");
+            JFrame frame = new JFrame("Wirtualna Kamera 3D");
             frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
             frame.setSize(WIDTH, HEIGHT);
             frame.setResizable(false);
