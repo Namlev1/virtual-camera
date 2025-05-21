@@ -40,10 +40,6 @@ public class BSPNode {
 
             for (Face face : coplanarFaces) {
                 renderer.fillFace(face);
-
-                for (src.Edge edge : face.getEdges()) {
-                    renderer.drawEdge(edge);
-                }
             }
 
             if (front != null) {
@@ -57,10 +53,6 @@ public class BSPNode {
 
             for (Face face : coplanarFaces) {
                 renderer.fillFace(face);
-
-                for (src.Edge edge : face.getEdges()) {
-                    renderer.drawEdge(edge);
-                }
             }
 
             if (back != null) {

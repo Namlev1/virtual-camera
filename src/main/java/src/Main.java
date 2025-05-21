@@ -171,10 +171,10 @@ public class Main extends JPanel {
         super.paintComponent(g);
 
         // Czyszczenie ekranu
-        g.setColor(Color.WHITE);
+        g.setColor(Color.BLACK);
         g.fillRect(0, 0, getWidth(), getHeight());
 
-        g.setColor(Color.BLACK);
+        g.setColor(Color.WHITE);
 
         renderer.setGraphics(g);
 
@@ -201,14 +201,17 @@ public class Main extends JPanel {
             }
         }
 
+        // Narysuj źródło światła
+        renderer.drawLightSource(movableLight);
+
         // Wyświetl informacje o stanie
-        g.setColor(Color.BLACK);
+        g.setColor(Color.WHITE);
         g.drawString("BSP: " + (bspEnabled ? "ON" : "OFF") + " (B)", 10, 20);
         g.drawString("Lighting: " + (lightingEnabled ? "ON" : "OFF") + " (L)", 10, 40);
         g.drawString("Wireframe: " + (wireframeMode ? "ON" : "OFF") + " (W)", 10, 60);
         g.drawString("Light position: " + formatVector(movableLight.getPosition()) + " (Shift+AOEQ',)", 10, 80);
     }
-
+    
     private String formatVector(org.ejml.simple.SimpleMatrix v) {
         return String.format("(%.1f, %.1f, %.1f)", v.get(0), v.get(1), v.get(2));
     }

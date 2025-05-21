@@ -86,10 +86,6 @@ public class Renderer {
 
     private void drawFaceDirectly(Face face) {
         fillFace(face);
-
-        for (Edge edge : face.getEdges()) {
-            drawEdge(edge);
-        }
     }
 
     public void renderWithBSP() {
@@ -157,7 +153,51 @@ public class Renderer {
 
         graphics.setColor(oldColor);
     }
+    public void drawLightSource(Light light) {
+        // Konwertuj pozycję światła na współrzędne ekranu
+        SimpleMatrix lightPos = new SimpleMatrix(3, 1);
+        lightPos.set(0, 0, light.getPosition().get(0));
+        lightPos.set(1, 0, light.getPosition().get(1));
+        lightPos.set(2, 0, light.getPosition().get(2));
 
+        SimpleMatrix point = convertToHomogeneousCoordinates(lightPos);
+        SimpleMatrix pointView = camera.getViewMatrix().mult(point);
+
+        // Sprawdź czy światło jest przed kamerą
+        if (pointView.get(2) <= 0) {
+            return;
+        }
+
+        SimpleMatrix pointClip = camera.getProjectionMatrix().mult(pointView);
+        float xNdc = (float) (pointClip.get(0) / pointClip.get(3));
+        float yNdc = (float) (pointClip.get(1) / pointClip.get(3));
+
+        int screenWidth = camera.getWIDTH();
+        int screenHeight = camera.getHEIGHT();
+
+        int screenX = (int) (screenWidth / 2 + xNdc * screenHeight / 2);
+        int screenY = (int) (screenHeight / 2 - yNdc * screenHeight / 2);
+
+        // Narysuj źródło światła jako małą kulkę
+        Color oldColor = graphics.getColor();
+        graphics.setColor(light.getColor());
+
+        // Narysuj kulkę jako wypełnione koło
+        int lightSize = 8;
+        graphics.fillOval(screenX - lightSize/2, screenY - lightSize/2, lightSize, lightSize);
+
+        // Dodaj mały efekt "blasku"
+        int glowSize = 12;
+        graphics.setColor(new Color(
+                light.getColor().getRed(),
+                light.getColor().getGreen(),
+                light.getColor().getBlue(),
+                128)); // Półprzezroczysty
+        graphics.fillOval(screenX - glowSize/2, screenY - glowSize/2, glowSize, glowSize);
+
+        graphics.setColor(oldColor);
+    }
+    
     public void drawEdge(Edge edge) {
         SimpleMatrix start = convertToHomogeneousCoordinates(edge.getStart());
         SimpleMatrix end = convertToHomogeneousCoordinates(edge.getEnd());
