@@ -3,6 +3,8 @@ package src;
 import lombok.Data;
 import org.ejml.simple.SimpleMatrix;
 import src.bsp.BSPTree;
+import src.lighting.Light;
+import src.lighting.Material;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -16,11 +18,29 @@ public class Renderer {
     private BSPTree bspTree;
     private boolean bspEnabled = false;
     private boolean rebuildRequired = true;
+    private boolean lightingEnabled = true;
+    private List<Light> lights;
+    private Material defaultMaterial;
 
     public Renderer(Camera camera, java.awt.Graphics graphics) {
         this.camera = camera;
         this.graphics = graphics;
         this.faces = new ArrayList<>();
+        this.lights = new ArrayList<>();
+
+        // Domyślny materiał
+        this.defaultMaterial = new Material(0.2f, 0.7f, 0.5f, 32);
+
+        // Domyślne światło
+        addLight(new Light(5.0f, 5.0f, 0.0f, Color.WHITE, 1.0f, 0.2f));
+    }
+
+    public void addLight(Light light) {
+        lights.add(light);
+    }
+
+    public void setLightingEnabled(boolean enabled) {
+        this.lightingEnabled = enabled;
     }
 
     public void setBSPEnabled(boolean enabled) {
@@ -77,7 +97,6 @@ public class Renderer {
 
         if (bspTree != null && !faces.isEmpty()) {
             bspTree.render(this, camera.getCameraPosition());
-
             clearFaces();
         }
     }
@@ -113,7 +132,26 @@ public class Renderer {
         }
 
         Color oldColor = graphics.getColor();
-        graphics.setColor(face.getColor());
+
+        if (lightingEnabled && !lights.isEmpty()) {
+            // Oblicz kolor z modelem Phonga
+            Color litColor = face.getColor();
+
+            for (Light light : lights) {
+                Color lightContribution = defaultMaterial.calculatePhongColor(face, camera.getCameraPosition(), light);
+
+                // Łączymy kolory światła (uproszczona metoda)
+                litColor = new Color(
+                        Math.min(255, litColor.getRed() + lightContribution.getRed()),
+                        Math.min(255, litColor.getGreen() + lightContribution.getGreen()),
+                        Math.min(255, litColor.getBlue() + lightContribution.getBlue())
+                );
+            }
+
+            graphics.setColor(litColor);
+        } else {
+            graphics.setColor(face.getColor());
+        }
 
         graphics.fillPolygon(xPoints, yPoints, numVertices);
 

@@ -12,16 +12,6 @@ public class Sphere {
     private int latitudeBands, longitudeBands;
     private Color color;
 
-    /**
-     * Tworzy kulę o podanym środku i promieniu.
-     *
-     * @param centerX Współrzędna X środka kuli
-     * @param centerY Współrzędna Y środka kuli
-     * @param centerZ Współrzędna Z środka kuli
-     * @param radius Promień kuli
-     * @param latitudeBands Liczba pasów szerokości geograficznej (im więcej, tym dokładniejsza kula)
-     * @param longitudeBands Liczba pasów długości geograficznej (im więcej, tym dokładniejsza kula)
-     */
     public Sphere(float centerX, float centerY, float centerZ, float radius,
                   int latitudeBands, int longitudeBands) {
         this.centerX = centerX;
@@ -34,23 +24,6 @@ public class Sphere {
 
         // Można użyć stałego koloru lub losować kolory dla każdej ściany
         this.color = new Color((float)Math.random(), (float)Math.random(), (float)Math.random());
-
-        generateSphere();
-    }
-
-    /**
-     * Tworzy kulę o podanym środku i promieniu z konkretnym kolorem.
-     */
-    public Sphere(float centerX, float centerY, float centerZ, float radius,
-                  int latitudeBands, int longitudeBands, Color color) {
-        this.centerX = centerX;
-        this.centerY = centerY;
-        this.centerZ = centerZ;
-        this.radius = radius;
-        this.latitudeBands = latitudeBands;
-        this.longitudeBands = longitudeBands;
-        this.faces = new ArrayList<>();
-        this.color = color;
 
         generateSphere();
     }

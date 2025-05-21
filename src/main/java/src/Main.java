@@ -6,6 +6,7 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.List;
+import src.lighting.Light;
 
 public class Main extends JPanel {
     private static final int WIDTH = 800;
@@ -16,6 +17,8 @@ public class Main extends JPanel {
     private final List<Face> allFaces;
     private boolean bspEnabled = true;
     private boolean wireframeMode = false;
+    private boolean lightingEnabled = true;
+    private Light movableLight;
 
     public Main() {
         // Inicjalizacja kamery z początkowym parametrem d = 2.0
@@ -26,6 +29,10 @@ public class Main extends JPanel {
         camera.recalculateViewMatrix();
 
         renderer = new Renderer(camera, null);
+
+        // Dodanie poruszalnego światła
+        movableLight = new Light(5.0f, 5.0f, 2.0f, Color.WHITE, 1.0f, 0.2f);
+        renderer.addLight(movableLight);
 
         allFaces = new ArrayList<>();
 
@@ -49,6 +56,65 @@ public class Main extends JPanel {
     private void handleKeyPress(KeyEvent e) {
         int keyCode = e.getKeyCode();
 
+        // Modyfikator Shift - kontrola światła zamiast kamery
+        boolean lightControl = e.isShiftDown();
+
+        if (lightControl) {
+            handleLightControls(keyCode);
+        } else {
+            handleCameraControls(keyCode);
+        }
+
+        // Dodatkowe kontrolki
+        switch (keyCode) {
+            case KeyEvent.VK_L:  // Włączanie/wyłączanie oświetlenia
+                lightingEnabled = !lightingEnabled;
+                renderer.setLightingEnabled(lightingEnabled);
+                break;
+            case KeyEvent.VK_B:  // Włączanie/wyłączanie BSP
+                bspEnabled = !bspEnabled;
+                renderer.setBSPEnabled(bspEnabled);
+                break;
+            case KeyEvent.VK_W:  // Włączanie/wyłączanie trybu wireframe
+                wireframeMode = !wireframeMode;
+                break;
+        }
+
+        repaint();
+    }
+
+    private void handleLightControls(int keyCode) {
+        float step = 0.5f;
+        org.ejml.simple.SimpleMatrix position = movableLight.getPosition();
+        float x = (float) position.get(0);
+        float y = (float) position.get(1);
+        float z = (float) position.get(2);
+
+        switch (keyCode) {
+            case KeyEvent.VK_A:  // Lewo
+                x -= step;
+                break;
+            case KeyEvent.VK_E:  // Prawo
+                x += step;
+                break;
+            case KeyEvent.VK_COMMA:  // Góra
+                y += step;
+                break;
+            case KeyEvent.VK_O:  // Dół
+                y -= step;
+                break;
+            case KeyEvent.VK_QUOTE:  // Przód
+                z += step;
+                break;
+            case KeyEvent.VK_PERIOD:  // Tył
+                z -= step;
+                break;
+        }
+
+        movableLight.setPosition(new org.ejml.simple.SimpleMatrix(3, 1, true, new float[]{x, y, z}));
+    }
+
+    private void handleCameraControls(int keyCode) {
         switch (keyCode) {
             // Translacja kamery
             case KeyEvent.VK_QUOTE:  // Przód (');
@@ -98,8 +164,6 @@ public class Main extends JPanel {
                 camera.changeZoom(-1);
                 break;
         }
-
-        repaint();
     }
 
     @Override
@@ -115,6 +179,7 @@ public class Main extends JPanel {
         renderer.setGraphics(g);
 
         renderer.setBSPEnabled(bspEnabled);
+        renderer.setLightingEnabled(lightingEnabled);
 
         // Rendering
         if (wireframeMode) {
@@ -135,11 +200,22 @@ public class Main extends JPanel {
                 }
             }
         }
+
+        // Wyświetl informacje o stanie
+        g.setColor(Color.BLACK);
+        g.drawString("BSP: " + (bspEnabled ? "ON" : "OFF") + " (B)", 10, 20);
+        g.drawString("Lighting: " + (lightingEnabled ? "ON" : "OFF") + " (L)", 10, 40);
+        g.drawString("Wireframe: " + (wireframeMode ? "ON" : "OFF") + " (W)", 10, 60);
+        g.drawString("Light position: " + formatVector(movableLight.getPosition()) + " (Shift+AOEQ',)", 10, 80);
+    }
+
+    private String formatVector(org.ejml.simple.SimpleMatrix v) {
+        return String.format("(%.1f, %.1f, %.1f)", v.get(0), v.get(1), v.get(2));
     }
 
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {
-            JFrame frame = new JFrame("Wirtualna Kamera 3D");
+            JFrame frame = new JFrame("Wirtualna Kamera 3D z oświetleniem Phonga");
             frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
             frame.setSize(WIDTH, HEIGHT);
             frame.setResizable(false);
