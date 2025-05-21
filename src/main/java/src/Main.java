@@ -22,17 +22,15 @@ public class Main extends JPanel {
         camera = new Camera(2.0f, WIDTH, HEIGHT);
 
         camera.setCameraPosition(new org.ejml.simple.SimpleMatrix(3, 1, true,
-                new float[]{0.0f, 0.0f, 0.0f}));
+                new float[]{0.0f, 0.0f, -5.0f}));  // Odsunięcie kamery, aby lepiej widzieć kulę
         camera.recalculateViewMatrix();
 
         renderer = new Renderer(camera, null);
 
         allFaces = new ArrayList<>();
 
-        addCubeToScene(-1f, -1f, 4.0f, 1.0f, 1.0f, 1.0f);  // Lewa dolna
-        addCubeToScene(1f, -1f, 4.0f, 1.0f, 1.0f, 1.0f);   // Prawa dolna
-        addCubeToScene(-1f, 1f, 4.0f, 1.0f, 1.0f, 1.0f);   // Lewa górna
-        addCubeToScene(1f, 1f, 4.0f, 1.0f, 1.0f, 1.0f);    // Prawa górna
+        // Dodanie kuli zamiast czterech sześcianów
+        addSphereToScene(0f, 0f, 4.0f, 2.0f, 20, 20);  // Kula o promieniu 2.0 na środku sceny
 
         setFocusable(true);
         addKeyListener(new KeyAdapter() {
@@ -43,10 +41,9 @@ public class Main extends JPanel {
         });
     }
 
-    private void addCubeToScene(float x, float y, float z, float width, float height, float depth) {
-        ColoredCube cube = new ColoredCube(x, y, z, width, height, depth);
-
-        allFaces.addAll(cube.getFaces());
+    private void addSphereToScene(float x, float y, float z, float radius, int latitudeBands, int longitudeBands) {
+        Sphere sphere = new Sphere(x, y, z, radius, latitudeBands, longitudeBands);
+        allFaces.addAll(sphere.getFaces());
     }
 
     private void handleKeyPress(KeyEvent e) {
