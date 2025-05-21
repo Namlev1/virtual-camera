@@ -13,7 +13,7 @@ public class Sphere {
     private Color color;
 
     public Sphere(float centerX, float centerY, float centerZ, float radius,
-                  int latitudeBands, int longitudeBands) {
+                  int latitudeBands, int longitudeBands, Color color) {
         this.centerX = centerX;
         this.centerY = centerY;
         this.centerZ = centerZ;
@@ -21,9 +21,7 @@ public class Sphere {
         this.latitudeBands = latitudeBands;
         this.longitudeBands = longitudeBands;
         this.faces = new ArrayList<>();
-
-        // Można użyć stałego koloru lub losować kolory dla każdej ściany
-        this.color = new Color((float)Math.random(), (float)Math.random(), (float)Math.random());
+        this.color = color;
 
         generateSphere();
     }

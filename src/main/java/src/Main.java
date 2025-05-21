@@ -7,6 +7,7 @@ import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.List;
 import src.lighting.Light;
+import src.lighting.MaterialPreset;
 
 public class Main extends JPanel {
     private static final int WIDTH = 800;
@@ -18,9 +19,13 @@ public class Main extends JPanel {
     private boolean bspEnabled = true;
     private boolean wireframeMode = false;
     private boolean lightingEnabled = true;
-    private Light movableLight;
-
+    private List<MaterialPreset> materialPresets;
+    private int currentMaterialIndex = 0;   private Light movableLight;
+    
     public Main() {
+        // Inicjalizacja materiałów
+        initializeMaterialPresets();
+
         // Inicjalizacja kamery z początkowym parametrem d = 2.0
         camera = new Camera(2.0f, WIDTH, HEIGHT);
 
@@ -31,13 +36,16 @@ public class Main extends JPanel {
         renderer = new Renderer(camera, null);
 
         // Dodanie poruszalnego światła
-        movableLight = new Light(5.0f, 5.0f, 2.0f, Color.WHITE, 1.0f, 0.2f);
+        movableLight = new Light(0.0f, 0.0f, 2.0f, Color.WHITE, 1.0f, 0.2f);
         renderer.addLight(movableLight);
+
+        // Ustaw domyślny materiał
+        updateMaterial();
 
         allFaces = new ArrayList<>();
 
-        // Dodanie kuli zamiast czterech sześcianów
-        addSphereToScene(0f, 0f, 4.0f, 2.0f, 20, 20);  // Kula o promieniu 2.0 na środku sceny
+        // Dodanie kuli
+        createSphere();
 
         setFocusable(true);
         addKeyListener(new KeyAdapter() {
@@ -48,9 +56,64 @@ public class Main extends JPanel {
         });
     }
 
-    private void addSphereToScene(float x, float y, float z, float radius, int latitudeBands, int longitudeBands) {
-        Sphere sphere = new Sphere(x, y, z, radius, latitudeBands, longitudeBands);
+    private void initializeMaterialPresets() {
+        materialPresets = new ArrayList<>();
+
+        // 1: Metal (silnie odbijający, słabo rozpraszający)
+        materialPresets.add(new MaterialPreset(
+                "Metal",
+                new Color(104, 104, 104),
+                0.05f,  // ambient - bardzo niski, metal nie emituje światła
+                0.3f,   // diffuse - niski, metal ma mało rozproszenia
+                1.0f,   // specular - bardzo wysoki, metal silnie odbija światło
+                48      // shininess - bardzo ostry i skoncentrowany odblask
+        ));
+
+        // 2: Plastik (umiarkowanie odbijający i rozpraszający)
+        materialPresets.add(new MaterialPreset(
+                "Plastik",
+                new Color(180, 120, 120),
+                0.1f,   // ambient - niski
+                0.6f,   // diffuse - umiarkowany, plastik rozpraszający
+                0.5f,   // specular - umiarkowany
+                32      // shininess - średnio ostry odblask
+        ));
+
+        // 3: Guma (słabo odbijający, silnie rozpraszający)
+        materialPresets.add(new MaterialPreset(
+                "Guma",
+                new Color(80, 150, 100),
+                0.15f,  // ambient - umiarkowany
+                0.8f,   // diffuse - wysoki, guma silnie rozprasza
+                0.2f,   // specular - niski, guma mało odbija
+                8       // shininess - rozproszony, matowy odblask
+        ));
+
+        // 4: Mat/Ściana (brak odbić, całkowicie rozpraszający)
+        materialPresets.add(new MaterialPreset(
+                "Mat",
+                new Color(220, 220, 220),
+                0.2f,   // ambient - wysoki
+                0.95f,  // diffuse - bardzo wysoki, całkowite rozproszenie
+                0.01f,   // specular - brak odbić, całkowicie matowy
+                1       // shininess - nie ma znaczenia, bo specular = 0
+        ));
+    }
+    
+    private void createSphere() {
+        allFaces.clear();
+
+        // Pobierz aktualny materiał
+        MaterialPreset currentPreset = materialPresets.get(currentMaterialIndex);
+
+        // Dodaj kulę z kolorem z aktualnego materiału
+        Sphere sphere = new Sphere(0f, 0f, 4.0f, 2.0f, 45, 45, currentPreset.getBaseColor());
         allFaces.addAll(sphere.getFaces());
+    }
+
+    private void updateMaterial() {
+        MaterialPreset currentPreset = materialPresets.get(currentMaterialIndex);
+        renderer.setDefaultMaterial(currentPreset.getMaterial());
     }
 
     private void handleKeyPress(KeyEvent e) {
@@ -63,6 +126,16 @@ public class Main extends JPanel {
             handleLightControls(keyCode);
         } else {
             handleCameraControls(keyCode);
+        }
+
+        // Obsługa zmiany materiału
+        if (keyCode >= KeyEvent.VK_1 && keyCode <= KeyEvent.VK_4) {
+            int materialIndex = keyCode - KeyEvent.VK_1;
+            if (materialIndex >= 0 && materialIndex < materialPresets.size()) {
+                currentMaterialIndex = materialIndex;
+                updateMaterial();
+                createSphere();  // Odtwórz kulę z nowym materiałem
+            }
         }
 
         // Dodatkowe kontrolki
@@ -82,7 +155,7 @@ public class Main extends JPanel {
 
         repaint();
     }
-
+    
     private void handleLightControls(int keyCode) {
         float step = 0.5f;
         org.ejml.simple.SimpleMatrix position = movableLight.getPosition();
@@ -210,6 +283,10 @@ public class Main extends JPanel {
         g.drawString("Lighting: " + (lightingEnabled ? "ON" : "OFF") + " (L)", 10, 40);
         g.drawString("Wireframe: " + (wireframeMode ? "ON" : "OFF") + " (W)", 10, 60);
         g.drawString("Light position: " + formatVector(movableLight.getPosition()) + " (Shift+AOEQ',)", 10, 80);
+
+        // Informacje o materiale
+        MaterialPreset currentPreset = materialPresets.get(currentMaterialIndex);
+        g.drawString("Material: " + currentPreset.getName() + " (1-4)", 10, 100);
     }
     
     private String formatVector(org.ejml.simple.SimpleMatrix v) {

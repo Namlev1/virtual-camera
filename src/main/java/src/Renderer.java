@@ -30,9 +30,6 @@ public class Renderer {
 
         // Domyślny materiał
         this.defaultMaterial = new Material(0.2f, 0.7f, 0.5f, 32);
-
-        // Domyślne światło
-        addLight(new Light(5.0f, 5.0f, 0.0f, Color.WHITE, 1.0f, 0.2f));
     }
 
     public void addLight(Light light) {
@@ -197,6 +194,7 @@ public class Renderer {
 
         graphics.setColor(oldColor);
     }
+    
     
     public void drawEdge(Edge edge) {
         SimpleMatrix start = convertToHomogeneousCoordinates(edge.getStart());
