@@ -6,6 +6,8 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.List;
+
+import org.ejml.simple.SimpleMatrix;
 import src.lighting.Light;
 import src.lighting.MaterialPreset;
 
@@ -254,6 +256,29 @@ public class Main extends JPanel {
         renderer.setBSPEnabled(bspEnabled);
         renderer.setLightingEnabled(lightingEnabled);
 
+        // ZMIANA: Narysuj źródło światła PRZED renderingiem obiektów, 
+        // ale tylko jeśli jest za kulą (dalej od kamery)
+        SimpleMatrix cameraPos = camera.getCameraPosition();
+        SimpleMatrix lightPos = movableLight.getPosition();
+
+        // Oblicz odległość od kamery do światła i do środka kuli
+        float distanceToLight = (float) Math.sqrt(
+                Math.pow(lightPos.get(0) - cameraPos.get(0), 2) +
+                        Math.pow(lightPos.get(1) - cameraPos.get(1), 2) +
+                        Math.pow(lightPos.get(2) - cameraPos.get(2), 2)
+        );
+
+        float distanceToSphere = (float) Math.sqrt(
+                Math.pow(0.0f - cameraPos.get(0), 2) +  // kula jest na pozycji (0, 0, 4)
+                        Math.pow(0.0f - cameraPos.get(1), 2) +
+                        Math.pow(4.0f - cameraPos.get(2), 2)
+        );
+
+        // Jeśli światło jest dalej od kamery niż kula, narysuj je przed kulą
+        if (distanceToLight > distanceToSphere) {
+            renderer.drawLightSource(movableLight);
+        }
+
         // Rendering
         if (wireframeMode) {
             for (Face face : allFaces) {
@@ -274,8 +299,10 @@ public class Main extends JPanel {
             }
         }
 
-        // Narysuj źródło światła
-        renderer.drawLightSource(movableLight);
+        // ZMIANA: Narysuj źródło światła TYLKO jeśli jest bliżej kamery niż kula
+        if (distanceToLight <= distanceToSphere) {
+            renderer.drawLightSource(movableLight);
+        }
 
         // Wyświetl informacje o stanie
         g.setColor(Color.WHITE);
