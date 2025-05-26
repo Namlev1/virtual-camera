@@ -39,7 +39,6 @@ public class Plane {
     }
 
     public static Plane fromFace(Face face) {
-        // Wierzchołki płaszczyzny
         Edge edge1 = face.getEdges().get(0);
         Edge edge2 = face.getEdges().get(1);
 
@@ -76,7 +75,6 @@ public class Plane {
         int backCount = 0;
         float epsilon = 0.0001f;
 
-        // Sprawdź wszystkie wierzchołki
         for (Edge edge : face.getEdges()) {
             SimpleMatrix vertex = edge.getStart();
             float distance = distanceToPoint(vertex);
@@ -120,7 +118,6 @@ public class Plane {
     }
 
     public Face[] splitFace(Face face) {
-        // Wydobądź wszystkie wierzchołki
         List<SimpleMatrix> vertices = new ArrayList<>();
         for (Edge edge : face.getEdges()) {
             vertices.add(edge.getStart());

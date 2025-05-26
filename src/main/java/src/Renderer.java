@@ -127,13 +127,11 @@ public class Renderer {
         Color oldColor = graphics.getColor();
 
         if (lightingEnabled && !lights.isEmpty()) {
-            // Oblicz kolor z modelem Phonga
             Color litColor = face.getColor();
 
             for (Light light : lights) {
                 Color lightContribution = defaultMaterial.calculatePhongColor(face, camera.getCameraPosition(), light);
 
-                // Łączymy kolory światła (uproszczona metoda)
                 litColor = new Color(
                         Math.min(255, litColor.getRed() + lightContribution.getRed()),
                         Math.min(255, litColor.getGreen() + lightContribution.getGreen()),
@@ -151,7 +149,6 @@ public class Renderer {
         graphics.setColor(oldColor);
     }
     public void drawLightSource(Light light) {
-        // Konwertuj pozycję światła na współrzędne ekranu
         SimpleMatrix lightPos = new SimpleMatrix(3, 1);
         lightPos.set(0, 0, light.getPosition().get(0));
         lightPos.set(1, 0, light.getPosition().get(1));
@@ -175,21 +172,18 @@ public class Renderer {
         int screenX = (int) (screenWidth / 2 + xNdc * screenHeight / 2);
         int screenY = (int) (screenHeight / 2 - yNdc * screenHeight / 2);
 
-        // Narysuj źródło światła jako małą kulkę
         Color oldColor = graphics.getColor();
         graphics.setColor(light.getColor());
 
-        // Narysuj kulkę jako wypełnione koło
         int lightSize = 8;
         graphics.fillOval(screenX - lightSize/2, screenY - lightSize/2, lightSize, lightSize);
 
-        // Dodaj mały efekt "blasku"
         int glowSize = 12;
         graphics.setColor(new Color(
                 light.getColor().getRed(),
                 light.getColor().getGreen(),
                 light.getColor().getBlue(),
-                128)); // Półprzezroczysty
+                128)); 
         graphics.fillOval(screenX - glowSize/2, screenY - glowSize/2, glowSize, glowSize);
 
         graphics.setColor(oldColor);

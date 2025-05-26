@@ -25,28 +25,23 @@ public class Main extends JPanel {
     private int currentMaterialIndex = 0;   private Light movableLight;
     
     public Main() {
-        // Inicjalizacja materiałów
         initializeMaterialPresets();
 
-        // Inicjalizacja kamery z początkowym parametrem d = 2.0
         camera = new Camera(2.0f, WIDTH, HEIGHT);
 
         camera.setCameraPosition(new org.ejml.simple.SimpleMatrix(3, 1, true,
-                new float[]{0.0f, 0.0f, -5.0f}));  // Odsunięcie kamery, aby lepiej widzieć kulę
+                new float[]{0.0f, 0.0f, -5.0f}));
         camera.recalculateViewMatrix();
 
         renderer = new Renderer(camera, null);
 
-        // Dodanie poruszalnego światła
         movableLight = new Light(0.0f, 0.0f, 2.0f, Color.WHITE, 1.0f, 0.2f);
         renderer.addLight(movableLight);
 
-        // Ustaw domyślny materiał
         updateMaterial();
 
         allFaces = new ArrayList<>();
 
-        // Dodanie kuli
         createSphere();
 
         setFocusable(true);
@@ -65,51 +60,49 @@ public class Main extends JPanel {
         materialPresets.add(new MaterialPreset(
                 "Metal",
                 new Color(104, 104, 104),
-                0.05f,  // ambient - bardzo niski, metal nie emituje światła
-                0.3f,   // diffuse - niski, metal ma mało rozproszenia
-                1.0f,   // specular - bardzo wysoki, metal silnie odbija światło
-                48      // shininess - bardzo ostry i skoncentrowany odblask
+                0.05f,
+                0.3f,
+                1.0f,
+                48
         ));
 
         // 2: Plastik (umiarkowanie odbijający i rozpraszający)
         materialPresets.add(new MaterialPreset(
                 "Plastik",
                 new Color(180, 120, 120),
-                0.1f,   // ambient - niski
-                0.6f,   // diffuse - umiarkowany, plastik rozpraszający
-                0.5f,   // specular - umiarkowany
-                32      // shininess - średnio ostry odblask
+                0.1f,
+                0.6f,
+                0.5f,
+                32
         ));
 
         // 3: Guma (słabo odbijający, silnie rozpraszający)
         materialPresets.add(new MaterialPreset(
                 "Guma",
                 new Color(80, 150, 100),
-                0.15f,  // ambient - umiarkowany
-                0.8f,   // diffuse - wysoki, guma silnie rozprasza
-                0.2f,   // specular - niski, guma mało odbija
-                8       // shininess - rozproszony, matowy odblask
+                0.15f,
+                0.8f,
+                0.2f,
+                8
         ));
 
         // 4: Mat/Ściana (brak odbić, całkowicie rozpraszający)
         materialPresets.add(new MaterialPreset(
                 "Mat",
                 new Color(220, 220, 220),
-                0.2f,   // ambient - wysoki
-                0.95f,  // diffuse - bardzo wysoki, całkowite rozproszenie
-                0.01f,   // specular - brak odbić, całkowicie matowy
-                1       // shininess - nie ma znaczenia, bo specular = 0
+                0.2f,
+                0.95f,
+                0.01f,
+                1
         ));
     }
     
     private void createSphere() {
         allFaces.clear();
 
-        // Pobierz aktualny materiał
         MaterialPreset currentPreset = materialPresets.get(currentMaterialIndex);
 
-        // Dodaj kulę z kolorem z aktualnego materiału
-        Sphere sphere = new Sphere(0f, 0f, 4.0f, 2.0f, 45, 45, currentPreset.getBaseColor());
+        Sphere sphere = new Sphere(0f, 0f, 4.0f, 2.0f, 20, 20, currentPreset.getBaseColor());
         allFaces.addAll(sphere.getFaces());
     }
 
@@ -121,7 +114,6 @@ public class Main extends JPanel {
     private void handleKeyPress(KeyEvent e) {
         int keyCode = e.getKeyCode();
 
-        // Modyfikator Shift - kontrola światła zamiast kamery
         boolean lightControl = e.isShiftDown();
 
         if (lightControl) {
@@ -130,17 +122,15 @@ public class Main extends JPanel {
             handleCameraControls(keyCode);
         }
 
-        // Obsługa zmiany materiału
         if (keyCode >= KeyEvent.VK_1 && keyCode <= KeyEvent.VK_4) {
             int materialIndex = keyCode - KeyEvent.VK_1;
             if (materialIndex >= 0 && materialIndex < materialPresets.size()) {
                 currentMaterialIndex = materialIndex;
                 updateMaterial();
-                createSphere();  // Odtwórz kulę z nowym materiałem
+                createSphere();
             }
         }
 
-        // Dodatkowe kontrolki
         switch (keyCode) {
             case KeyEvent.VK_L:  // Włączanie/wyłączanie oświetlenia
                 lightingEnabled = !lightingEnabled;
@@ -256,12 +246,9 @@ public class Main extends JPanel {
         renderer.setBSPEnabled(bspEnabled);
         renderer.setLightingEnabled(lightingEnabled);
 
-        // ZMIANA: Narysuj źródło światła PRZED renderingiem obiektów, 
-        // ale tylko jeśli jest za kulą (dalej od kamery)
         SimpleMatrix cameraPos = camera.getCameraPosition();
         SimpleMatrix lightPos = movableLight.getPosition();
 
-        // Oblicz odległość od kamery do światła i do środka kuli
         float distanceToLight = (float) Math.sqrt(
                 Math.pow(lightPos.get(0) - cameraPos.get(0), 2) +
                         Math.pow(lightPos.get(1) - cameraPos.get(1), 2) +
@@ -269,12 +256,11 @@ public class Main extends JPanel {
         );
 
         float distanceToSphere = (float) Math.sqrt(
-                Math.pow(0.0f - cameraPos.get(0), 2) +  // kula jest na pozycji (0, 0, 4)
+                Math.pow(0.0f - cameraPos.get(0), 2) +
                         Math.pow(0.0f - cameraPos.get(1), 2) +
                         Math.pow(4.0f - cameraPos.get(2), 2)
         );
 
-        // Jeśli światło jest dalej od kamery niż kula, narysuj je przed kulą
         if (distanceToLight > distanceToSphere) {
             renderer.drawLightSource(movableLight);
         }
@@ -299,7 +285,6 @@ public class Main extends JPanel {
             }
         }
 
-        // ZMIANA: Narysuj źródło światła TYLKO jeśli jest bliżej kamery niż kula
         if (distanceToLight <= distanceToSphere) {
             renderer.drawLightSource(movableLight);
         }

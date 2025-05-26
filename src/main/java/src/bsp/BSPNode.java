@@ -27,9 +27,6 @@ public class BSPNode {
         this.plane = Plane.fromFace(partitionFace);
     }
 
-    /**
-     * back-to-front
-     */
     public void render(Renderer renderer, SimpleMatrix cameraPosition) {
         float distance = plane.distanceToPoint(cameraPosition);
 
